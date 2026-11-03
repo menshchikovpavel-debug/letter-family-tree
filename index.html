@@ -6,7 +6,7 @@
 <title>Letter Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Sans+Cuneiform&family=Noto+Sans+Egyptian+Hieroglyphs&family=Noto+Sans+Ugaritic&family=Noto+Sans+Phoenician&family=Noto+Sans+Old+South+Arabian&family=Noto+Sans+Ethiopic&family=Noto+Sans+Samaritan&family=Noto+Sans+Imperial+Aramaic&family=Noto+Sans+Hebrew&family=Noto+Sans+Nabataean&family=Noto+Sans+Arabic&family=Noto+Sans+Palmyrene&family=Noto+Sans+Syriac&family=Noto+Sans+Mandaic&family=Noto+Sans+Sogdian&family=Noto+Serif+Old+Uyghur&family=Noto+Sans+Mongolian&family=Noto+Sans+Old+Italic&family=Noto+Sans+Coptic&family=Noto+Sans+Gothic&family=Noto+Sans+Glagolitic&family=Noto+Sans+Armenian&family=Noto+Sans+Georgian&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel&family=UnifrakturMaguntia&family=Noto+Sans+Cuneiform&family=Noto+Sans+Egyptian+Hieroglyphs&family=Noto+Sans+Ugaritic&family=Noto+Sans+Phoenician&family=Noto+Sans+Old+South+Arabian&family=Noto+Sans+Ethiopic&family=Noto+Sans+Samaritan&family=Noto+Sans+Imperial+Aramaic&family=Noto+Sans+Hebrew&family=Noto+Sans+Nabataean&family=Noto+Sans+Arabic&family=Noto+Sans+Palmyrene&family=Noto+Sans+Syriac&family=Noto+Sans+Mandaic&family=Noto+Sans+Sogdian&family=Noto+Serif+Old+Uyghur&family=Noto+Sans+Mongolian&family=Noto+Sans+Old+Italic&family=Noto+Sans+Coptic&family=Noto+Sans+Gothic&family=Noto+Sans+Glagolitic&family=Noto+Sans+Armenian&family=Noto+Sans+Georgian&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#eeeeee; --card:#ffffff; --ink:#1c1c1c;
@@ -156,6 +156,8 @@
   .f-arm{font-family:"Noto Sans Armenian",serif}
   .f-geo{font-family:"Noto Sans Georgian",serif}
   .f-lat{font-family:"EB Garamond",Georgia,serif}
+  .f-cap{font-family:"Cinzel","EB Garamond",serif}
+  .f-bl{font-family:"UnifrakturMaguntia","EB Garamond",serif}
 </style>
 </head>
 <body>
@@ -203,7 +205,34 @@ var DRAWN = {
   ox:   ["M34 46 L66 46","M34 46 L50 84 L66 46",
          "M34 46 C22 40 14 26 18 13","M66 46 C78 40 86 26 82 13"],
   house:["M76 24 L24 24 L24 80 L76 80 L76 62","M76 24 L76 42"],
-  stick:["M22 78 L50 28 C56 18 70 16 80 22"]
+  stick:["M22 78 L50 28 C56 18 70 16 80 22"],
+  gk_a_arch: ["M14 50 L84 20","M14 50 L84 80","M54 33 L54 67"],
+  gk_a_west: ["M54 14 L22 86","M54 14 L78 86","M34 60 L69 60"],
+  lat_A_old: ["M58 14 L20 86","M58 14 L76 86","M37 54 L70 64"],
+  rust_A: ["M50 12 C46 40 42 64 38 84","M50 12 C54 40 58 68 60 92","M42 58 L58 58"],
+  orc_a: ["M44 16 C58 11 70 14 72 21","M44 16 L28 60 C25 77 46 87 64 78","M72 19 L72 81"],
+  nrc_a: ["M66 40 C56 30 34 32 28 48 C22 66 36 80 52 76 C60 74 66 66 66 58","M66 30 L66 80"],
+  unc_A: ["M72 18 C44 24 26 44 26 62 C26 78 44 84 60 76 C68 72 72 66 72 58","M72 18 L72 80"],
+  hunc_a: ["M66 42 C58 33 39 33 32 46 C25 61 34 78 50 78 C60 78 66 71 66 61","M66 36 L66 80"],
+  car_a: ["M68 47 C60 37 40 37 33 50 C26 65 35 79 51 79 C62 79 68 71 68 62","M68 30 L68 81"],
+  gk_b_arch: ["M28 14 L28 86","M28 14 L62 24 L28 48","M28 48 L66 60 L28 86"],
+  gk_b_west: ["M30 14 L30 86","M30 14 C62 14 66 44 30 48","M30 48 C68 48 72 86 30 86"],
+  lat_B_old: ["M30 14 L30 86","M30 14 C56 16 58 40 30 44","M30 44 C66 46 68 86 30 86"],
+  rust_B: ["M36 12 C34 40 32 64 30 88","M36 12 C54 14 56 36 34 42","M34 42 C58 44 60 82 31 84"],
+  orc_b: ["M62 12 L62 82","M62 38 C40 34 28 48 32 62 C36 76 54 78 62 70"],
+  nrc_b: ["M30 12 L30 80","M30 44 C46 34 66 40 66 56 C66 72 46 82 30 74"],
+  unc_B: ["M32 10 L32 84","M32 10 C52 12 54 30 32 36","M32 36 C68 38 70 86 32 84"],
+  hunc_b: ["M30 10 L30 80","M30 42 C46 32 68 40 68 58 C68 76 46 84 30 74"],
+  car_b: ["M30 8 L30 80","M30 46 C44 36 66 42 66 60 C66 76 46 84 30 76"],
+  gk_g_arch: ["M50 16 L24 84","M50 16 L74 84"],
+  gk_g_west: ["M74 22 L36 36 L30 52 L38 68 L74 78"],
+  lat_C_old: ["M74 24 C56 12 26 20 26 50 C26 80 56 88 74 76"],
+  rust_C: ["M66 20 C52 12 34 22 34 50 C34 78 52 88 66 80"],
+  orc_c: ["M70 26 C52 16 30 26 32 50 C34 74 54 82 70 72"],
+  nrc_c: ["M68 38 C58 30 40 32 36 46 C32 62 44 76 60 74 C64 73 67 70 69 66"],
+  unc_C: ["M72 26 C56 14 24 20 24 50 C24 80 56 86 72 74"],
+  hunc_c: ["M70 36 C58 26 36 28 32 46 C28 64 42 78 60 74 C65 73 68 70 70 66"],
+  car_c: ["M70 40 C60 30 40 32 36 48 C32 64 44 76 60 72 C65 71 68 68 70 64"]
 };
 function svgSign(key){
   var d = DRAWN[key] || DRAWN.ox;
@@ -217,6 +246,104 @@ var UC = function(hex){ return [['Unicode '+hex,'Unicode '+hex], 'https://www.un
 
 /* ═══ письменности: описание пишется один раз на все три буквы ═══ */
 var SC = {
+ grkArch:{n:['Архаический греческий','Archaic Greek'], d:['VIII в. до н. э.','8th c. BCE'],
+   m:['Греция','Greece'],
+   x:[['В древнейших греческих надписях буква лежит на боку: писали ещё справа налево, и знаки зеркалились. Форма встаёт на ноги только вместе с переходом на письмо слева направо.',
+       'In the earliest Greek inscriptions the letter rests on its side: writing still ran right to left and the signs were mirrored. It stands upright only once the direction flips.'],
+      ['Местных вариантов было множество, они держались примерно до 400 г. до н. э.; Афины официально приняли единый алфавит в 403 г. до н. э.',
+       'Local varieties were many and lasted until about 400 BCE; Athens officially adopted the unified alphabet in 403 BCE.']],
+   u:'', s:[W('Archaic_Greek_alphabets'), W('Greek_alphabet')]},
+
+ grkWest:{n:['Западногреческий («красный»)','Western Greek ("red")'], d:['VIII в. до н. э.','8th c. BCE'],
+   m:['Эвбея, Кумы, Питекусы','Euboea, Cumae, Pithekoussai'],
+   x:[['Вот куда уходит латиница. «Красный» западный тип бытовал в Эвбее, центральной Греции и почти во всех италийских колониях; «именно он был передан на Запад и стал предком латинского алфавита».',
+       'This is where Latin goes. The "red" western type was used in Euboea, central Greece and most Italian colonies; it "is the one that was later transmitted to the West and became the ancestor of the Latin alphabet".'],
+      ['То есть латиница пришла не из классического греческого, который мы знаем по математике: тот ионийский, «синий» тип — двоюродный брат, а не предок.',
+       'So Latin did not come from the classical Greek we know from mathematics: that Ionic, "blue" type is a cousin, not an ancestor.']],
+   u:'', s:[W('Archaic_Greek_alphabets')]},
+
+ latOld:{n:['Старолатинское письмо','Old Latin'], d:['VII–VI вв. до н. э.','7th–6th c. BCE'],
+   m:['Лаций','Latium'],
+   x:[['Древнейшие латинские формы видны на надписи Дуэноса VI века до н. э.: поперечины косые, штрихи неравной длины, направление письма ещё непостоянно.',
+       'The oldest Latin forms appear on the 6th-century BCE Duenos inscription: slanting crossbars, strokes of unequal length, the direction of writing not yet fixed.']],
+   u:'', s:[W('History_of_the_Latin_script'), W('Duenos_inscription')]},
+
+ latCap:{n:['Римский монументальный капитал','Roman monumental capitals'], d:['I в. до н. э. — V в.','1st c. BCE – 5th c. CE'],
+   m:['Рим','Rome'],
+   x:[['Capitalis monumentalis — парадное письмо надписей на камне, размеченное кистью и резанное долотом. Отсюда происходят все современные прописные.',
+       'Capitalis monumentalis — the formal script of stone inscriptions, laid out with a brush and cut with a chisel. All modern capitals come from here.'],
+      ['Дальше цепочка раздваивается: прописная отсюда почти не менялась, а строчная пошла длинным путём через скоропись и книжные почерки.',
+       'From here the chain forks: the capital barely changed, while the lowercase took the long road through cursive and book hands.']],
+   u:'', s:[W('Roman_square_capitals')]},
+
+ latMaj:{n:['Современная прописная','Modern capital'], d:['сегодня','today'],
+   m:['Латиница','Latin alphabet'],
+   x:[['Девятнадцать веков без единого заметного шага. Гуманисты XV века просто вернули римский капитал как прописную к своему минускулу, и с него печатники нарезали первые шрифты антиквы.',
+       'Nineteen centuries without a single visible step. The 15th-century humanists simply brought back the Roman capital as the uppercase for their minuscule, and the printers cut the first roman types from it.']],
+   u:'U+0041 · U+0042 · U+0043', s:[W('Roman_square_capitals'), W('Humanist_minuscule')]},
+
+ latRust:{n:['Рустичный капитал','Rustic capitals'], d:['I–IX вв.','1st–9th c. CE'],
+   m:['Рим','Rome'],
+   x:[['«Похож на римский квадратный капитал, но менее жёсткий, под большим влиянием письма пером и чернилами. Буквы тоньше и сжатее, кривых линий намного больше, есть выносные элементы ниже строки».',
+       '"Similar to Roman square capitals, but are less rigid, influenced more by pen and ink writing. The letters are thinner and more compressed, use many more curved lines than do square capitals, and have descenders extending below the baseline."']],
+   u:'', s:[W('Rustic_capitals')]},
+
+ latOrc:{n:['Староримский курсив','Old Roman cursive'], d:['I в. до н. э. — III в.','1st c. BCE – 3rd c. CE'],
+   m:['Рим','Rome'],
+   x:[['Бытовое письмо: счета, письма, граффити, школьные упражнения. «Углы обычных букв писались в римском курсиве кривыми».',
+       'Everyday writing: accounts, letters, graffiti, classroom exercises. "The angles of standard letters were written as curves in Roman cursive."'],
+      ['Читать его тяжело: «⟨b⟩ и ⟨d⟩ трудно различить, ⟨e⟩ в полную высоту, ⟨p⟩ и ⟨t⟩ очень похожи».',
+       'It is hard to read: "b and d are hard to distinguish, e is a full height letter, p and t are very similar."']],
+   u:'', s:[W('Roman_cursive')]},
+
+ latNrc:{n:['Новоримский курсив','New Roman cursive'], d:['III–VII вв.','3rd–7th c. CE'],
+   m:['Рим','Rome'],
+   x:[['Переломный момент для строчных: «⟨a⟩, ⟨b⟩, ⟨d⟩ и ⟨e⟩ принимают более привычный вид», и буквы становятся соразмерны друг другу.',
+       'The turning point for lowercase: "a, b, d, and e have taken a more familiar shape", and the letters become proportionate to one another.'],
+      ['Отсюда унциал и полуунциал взяли свои ⟨a⟩, ⟨g⟩, ⟨r⟩ и ⟨s⟩. На схеме проведена одна линия, но наследование тут двойное: книжные почерки тянули и от капитала, и от курсива.',
+       'This is where uncial and half-uncial took their a, g, r and s. The map draws one line, but the inheritance is double: the book hands pulled from both the capital and the cursive.']],
+   u:'', s:[W('Roman_cursive')]},
+
+ latUnc:{n:['Унциал','Uncial'], d:['IV–VIII вв.','4th–8th c. CE'],
+   m:['Латинский и греческий Запад','the Latin and Greek West'],
+   x:[['«Маюскульное письмо, широко употреблявшееся с IV по VIII век латинскими и греческими писцами». Широкие одномоментные штрихи круглых форм: пергамен позволял то, чего не позволял папирус.',
+       '"A majuscule script commonly used from the 4th to 8th centuries AD by Latin and Greek scribes." Broad single-stroke letters using simple round forms: parchment allowed what papyrus did not.'],
+      ['«Ранний унциал, скорее всего, развился из позднего рустичного капитала».',
+       '"Early uncial script most likely developed from late rustic capitals."']],
+   u:'', s:[W('Uncial_script')]},
+
+ latHunc:{n:['Полуунциал','Half-uncial'], d:['III–VIII вв.','3rd–8th c. CE'],
+   m:['Рим, Африка, Ирландия, Англия','Rome, Africa, Ireland, England'],
+   x:[['Здесь появляются настоящие строчные: «⟨a⟩ обычно круглая ⟨ɑ⟩, иногда со слегка открытым верхом», «⟨b⟩ и ⟨d⟩ имеют вертикальные стойки, тождественные современным буквам».',
+       'Here the real lowercase appears: "a is usually round, sometimes with a slightly open top", "b and d have vertical stems, identical to the modern letters."'],
+      ['Название обманчиво: «полуунциал — плохое имя, поскольку предполагает некий органический долг перед обычным унциалом». Оба наследуют рустичному капиталу; по другой версии полуунциал идёт от позднеримского курсива.',
+       'The name misleads: "half-uncial is a poor name to the extent that it suggests some organic debt to regular uncial". Both inherit from rustic capitals; by another view half-uncial descends from late Roman cursive.']],
+   u:'', s:[W('Half-uncial'), W('Uncial_script')]},
+
+ latCaro:{n:['Каролингский минускул','Carolingian minuscule'], d:['конец VIII — IX в.','late 8th – 9th c.'],
+   m:['Ахен, Тур, Корби','Aachen, Tours, Corbie'],
+   x:[['Создан при Карле Великом. Алкуин Йоркский руководил придворным скрипторием в Ахене в 782–796 годах, затем перестроил скрипторий в Туре.',
+       'Created under Charlemagne. Alcuin of York ran the palace scriptorium at Aachen from 782 to 796, then restructured the scriptorium at Tours.'],
+      ['«Единообразное письмо округлых форм, ясно различимые знаки, дисциплинированное и прежде всего читаемое». Пробелы между словами и прописные для заголовков — отсюда.',
+       '"Uniform with rounded shapes in clearly distinguishable glyphs, disciplined and above all, legible." Spaces between words and capitals for titles start here.']],
+   u:'', s:[W('Carolingian_minuscule')]},
+
+ latBlack:{n:['Готический минускул','Blackletter'], d:['XI–XV вв.','11th–15th c.'],
+   m:['Северная Европа','Northern Europe'],
+   x:[['Каролингский минускул, сжатый и переломанный: «в десятом и одиннадцатом веках он развился в письмо, ставшее известным как блэклеттер, или готическое».',
+       'Carolingian minuscule compressed and broken: it "evolved in the tenth and eleventh centuries into a script which became known as blackletter or Gothic script."'],
+      ['Для современной антиквы это тупик: Гутенберг печатал готикой, но победили итальянские печатники с гуманистическим минускулом. В Германии и Скандинавии готика держалась до XX века.',
+       'A dead end for modern roman type: Gutenberg printed in blackletter, but the Italian printers with their humanist minuscule won. In Germany and Scandinavia blackletter held on into the 20th century.']],
+   u:'', s:[W('Blackletter')]},
+
+ latHum:{n:['Гуманистический минускул','Humanist minuscule'], d:['начало XV в.','early 15th c.'],
+   m:['Флоренция','Florence'],
+   x:[['«Создателем нового стиля был Поджо Браччолини, неутомимый охотник за древними рукописями, который разработал новый гуманистический почерк в первое десятилетие XV века».',
+       '"The generator of the new style was Poggio Bracciolini, a tireless pursuer of ancient manuscripts, who developed the new humanist script in the first decade of the 15th century."'],
+      ['В основании всей нашей типографики лежит ошибка: гуманисты приняли каролингские рукописи XI–XII веков за древнеримские. «Когда они держали в руках книги, переписанные писцами одиннадцатого и двенадцатого веков, литераторы кватроченто думали, что смотрят на тексты прямо из книжных лавок древнего Рима».',
+       'A mistake sits at the root of all our typography: the humanists took 11th–12th-century Carolingian manuscripts for ancient Roman ones. "When they handled manuscript books copied by eleventh- and twelfth-century scribes, Quattrocento literati thought they were looking at texts that came right out of the bookshops of ancient Rome."']],
+   u:'', s:[W('Humanist_minuscule')]},
+
  cun:{n:['Клинопись','Cuneiform'], d:['с конца IV тыс. до н. э.','from the late 4th mill. BCE'],
    m:['Шумер, Месопотамия','Sumer, Mesopotamia'],
    x:[['Древнейшее известное письмо. Алфавиту оно НЕ предок: в справочнике у клинописи прямо указано «дочерних систем нет; повлияла на форму знаков угаритского и древнеперсидского».',
@@ -479,7 +606,7 @@ var SCL = {
 
  mand: S('aram','ࡀ','ࡁ','ࡂ','f-man', ['halqa','ab','ag'], {}),
 
- grk:  S('phn', 'Α','Β','Γ','f-lat', ['альфа / alpha','бета / beta','гамма / gamma'], {
+ grk:  S('grkArch', 'Α','Β','Γ','f-lat', ['альфа / alpha','бета / beta','гамма / gamma'], {
    0:['Тот самый момент: согласный становится гласным /a/. Первая буква для гласного звука в истории письма.',
       'The moment itself: a consonant becomes the vowel /a/. The first letter for a vowel sound in the history of writing.'],
    1:['У беты «самое большое число резко расходящихся местных форм» из всех греческих букв (Jeffery, 1961).',
@@ -487,15 +614,51 @@ var SCL = {
    2:['«В архаической Греции форма гаммы была ближе к классической лямбде (Λ), тогда как лямбда сохраняла финикийскую L-образную форму».',
       '"In Archaic Greece, the shape of gamma was closer to a classical lambda (Λ), while lambda retained the Phoenician L-shape."']}),
 
- etr:  S('grk', '𐌀','𐌁','𐌂','f-ita', ['a','be','ke'], {
+ etr:  S('grkWest', '𐌀','𐌁','𐌂','f-ita', ['a','be','ke'], {
    1:['Этруски этой буквой практически не писали: звонких смычных в языке не было. Она проехала через этрусский как пассажир и досталась латинянам, которым /b/ был нужен.',
       'The Etruscans barely wrote with this letter: their language had no voiced stops. It rode through as a passenger and reached the Latins, who needed /b/.'],
    2:['Греческую гамму со звуком /g/ этруски приспособили под /k/. Отсюда вся дальнейшая путаница латинской C.',
       'The Etruscans repurposed Greek gamma with its /g/ for /k/. All the later confusion around Latin C starts here.']}),
 
- lat:  S('etr', 'A','B','C','f-lat', ['A a','B b','C c · G g'], {2:[
-   'Одна буква C веками обслуживала и /k/, и /g/. Около 230 г. до н. э. к ней добавили штрих и получили G, поставив новую букву на седьмое место — туда, где раньше стояла выброшенная Z.',
-   'A single letter C served both /k/ and /g/ for centuries. Around 230 BCE a stroke was added to make G, and it took seventh place — the slot of the discarded Z.']}),
+ grkArch: S('phn','gk_a_arch','gk_b_arch','gk_g_arch', null, ['альфа / alpha','бета / beta','гамма / gamma'], {
+   0:['Тот самый момент: согласный становится гласным /a/. Первая буква для гласного звука в истории письма — и она пока лежит на боку.',
+      'The moment itself: a consonant becomes the vowel /a/. The first letter for a vowel sound in history — and it is still lying on its side.'],
+   2:['«В архаической Греции форма гаммы была ближе к классической лямбде (Λ), тогда как лямбда сохраняла финикийскую L-образную форму» — какое-то время они выглядели наоборот.',
+      '"In Archaic Greece, the shape of gamma was closer to a classical lambda (Λ), while lambda retained the Phoenician L-shape" — for a while the two looked swapped.']}),
+
+ grkWest: S('grkArch','gk_a_west','gk_b_west','gk_g_west', null, ['альфа / alpha','бета / beta','гамма / gamma'], {
+   2:['Здесь гамма становится округлой, почти C-образной. Именно эта форма и станет латинской C.',
+      'Here gamma turns rounded, nearly C-shaped. This very form becomes Latin C.']}),
+
+ latOld: S('etr','lat_A_old','lat_B_old','lat_C_old', null, ['A','B','C'], {
+   2:['«В древнейших латинских надписях буквы c k q использовались для передачи звуков /k/ и /ɡ/»: «q» перед огублённой гласной, «k» перед «a», «c» во всех остальных случаях.',
+      '"In the earliest Latin inscriptions, the letters c k q were used to represent the sounds /k/ and /ɡ/": q before a rounded vowel, k before a, c elsewhere.']}),
+
+ latCap: S('latOld','A','B','C','f-cap', ['A','B','C'], {
+   2:['Около 230 г. до н. э. к C добавили штрих и получили G, поставив новую букву на седьмое место — туда, где раньше стояла выброшенная цензором Аппием Клавдием Z.',
+      'Around 230 BCE a stroke was added to C to make G, and the new letter took seventh place — the slot of the Z discarded by the censor Appius Claudius.']}),
+
+ latMaj: S('latCap','A','B','C','f-lat', ['A','B','C'], {}),
+ latRust:S('latCap','rust_A','rust_B','rust_C', null, ['A','B','C'], {}),
+ latOrc: S('latCap','orc_a','orc_b','orc_c', null, ['a','b','c'], {
+   1:['«⟨b⟩ в римском курсиве имеет полукруглый выступ с левой стороны» — из-за этого ⟨b⟩ и ⟨d⟩ почти неразличимы.',
+      '"The letter b in Roman cursive contains a semicircular protuberance on its left side" — which makes b and d nearly indistinguishable.'],
+   2:['Источники перечисляют трудные для чтения буквы староримского курсива, но ⟨c⟩ среди них не разбирают. Контур показан по общему правилу «углы писались кривыми»; это схема, а не засвидетельствованное начертание.',
+      'The sources list the hard-to-read letters of old Roman cursive but do not discuss c. The outline follows the general rule that "angles were written as curves": a schematic, not an attested form.']}),
+ latNrc: S('latOrc','nrc_a','nrc_b','nrc_c', null, ['a','b','c'], {}),
+ latUnc: S('latRust','unc_A','unc_B','unc_C', null, ['A','B','C'], {
+   0:['«В греческом почерке было принято сводить левую ногу и горизонтальный штрих в одну петлю» — отсюда и пошла наша строчная a.',
+      '"In Greek handwriting, it was common to join the left leg and horizontal stroke into a single loop" — and that is where our lowercase a comes from.']}),
+ latHunc:S('latUnc','hunc_a','hunc_b','hunc_c', null, ['a','b','c'], {}),
+ latCaro:S('latHunc','car_a','car_b','car_c', null, ['a','b','c'], {}),
+ latBlack:S('latCaro','a','b','c','f-bl', ['a','b','c'], {}),
+ latHum: S('latCaro','a','b','c','f-lat', ['a','b','c'], {}),
+
+ lat:  S('latHum', 'a','b','c','f-lat', ['a','b','c · g'], {
+   0:['Двухэтажная a — наследница каролингского и гуманистического минускула. Одноэтажная ɑ (U+0251) — та же буква в рукописном и курсивном изводе.',
+      'The double-storey a descends from Carolingian and humanist minuscule. The single-storey ɑ (U+0251) is the same letter in its handwritten and italic form.'],
+   2:['Двухэтажная «петлехвостая» g — исходная, она же каролингская. Одноэтажная появилась позже; Гутенберг печатал именно ею, а гуманисты вернули петлю.',
+      'The double-storey looptail g is the original, the Carolingian one. The single-storey form came later; Gutenberg printed with it, and the humanists brought the loop back.']}),
 
  copt: S('grk', 'Ⲁ','Ⲃ','Ⲅ','f-cop', ['альфа / alfa','вида / vida','гамма / gamma'], {}),
  goth: S('grk', '𐌰','𐌱','𐌲','f-got', ['ahsa','bairkan','giba'], {}),
@@ -518,6 +681,7 @@ var SCL = {
 };
 
 /* живые алфавиты — в фильтр; вымершие — отдельной строкой */
+var ALSO = {lat:['latMaj','latBlack']};
 var LIVING  = ['lat','grk','cyr','heb','arab','syr','geez','arm','geo','copt','mong','sam','mand'];
 var EXTINCT = ['ugar','goth','glag','cun'];
 var SELECTED = {lat:true};
@@ -527,12 +691,15 @@ function visibleSet(){
   var vis = {};
   Object.keys(SELECTED).forEach(function(id){
     if(!SELECTED[id]) return;
-    var cur = id;
-    while(cur && SCL[cur]){
-      vis[cur] = true;
-      if(cur === 'egy') break;
-      cur = SCL[cur].p;
-    }
+    var queue = [id].concat(ALSO[id] || []);
+    queue.forEach(function(start){
+      var cur = start;
+      while(cur && SCL[cur]){
+        vis[cur] = true;
+        if(cur === 'egy') break;
+        cur = SCL[cur].p;
+      }
+    });
   });
   if(!Object.keys(vis).length) vis.egy = true;
   return vis;
