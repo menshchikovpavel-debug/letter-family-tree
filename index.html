@@ -1,966 +1,776 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Дерево букв</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Letter Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@400&family=Noto+Sans+Egyptian+Hieroglyphs&family=Noto+Sans+Old+Italic&family=Noto+Sans+Phoenician&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Sans+Cuneiform&family=Noto+Sans+Egyptian+Hieroglyphs&family=Noto+Sans+Ugaritic&family=Noto+Sans+Phoenician&family=Noto+Sans+Old+South+Arabian&family=Noto+Sans+Ethiopic&family=Noto+Sans+Samaritan&family=Noto+Sans+Imperial+Aramaic&family=Noto+Sans+Hebrew&family=Noto+Sans+Nabataean&family=Noto+Sans+Arabic&family=Noto+Sans+Palmyrene&family=Noto+Sans+Syriac&family=Noto+Sans+Mandaic&family=Noto+Sans+Sogdian&family=Noto+Serif+Old+Uyghur&family=Noto+Sans+Mongolian&family=Noto+Sans+Old+Italic&family=Noto+Sans+Coptic&family=Noto+Sans+Gothic&family=Noto+Sans+Glagolitic&family=Noto+Sans+Armenian&family=Noto+Sans+Georgian&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#eeeeee;
-    --card:#ffffff;
-    --ink:#1c1c1c;
-    --ink-70:rgba(28,28,28,.70);
-    --ink-45:rgba(28,28,28,.45);
-    --ink-28:rgba(28,28,28,.28);
-    --rule:rgba(28,28,28,.30);
+    --paper:#eeeeee; --card:#ffffff; --ink:#1c1c1c;
+    --ink-70:rgba(28,28,28,.70); --ink-45:rgba(28,28,28,.45);
+    --ink-28:rgba(28,28,28,.28); --rule:rgba(28,28,28,.30);
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --paper:#1c1c1c;
-      --card:#262626;
-      --ink:#eeeeee;
-      --ink-70:rgba(238,238,238,.70);
-      --ink-45:rgba(238,238,238,.45);
-      --ink-28:rgba(238,238,238,.28);
-      --rule:rgba(238,238,238,.32);
+      --paper:#1c1c1c; --card:#262626; --ink:#eeeeee;
+      --ink-70:rgba(238,238,238,.70); --ink-45:rgba(238,238,238,.45);
+      --ink-28:rgba(238,238,238,.28); --rule:rgba(238,238,238,.32);
     }
   }
   :root[data-theme="dark"]{
-    --paper:#1c1c1c;
-    --card:#262626;
-    --ink:#eeeeee;
-    --ink-70:rgba(238,238,238,.70);
-    --ink-45:rgba(238,238,238,.45);
-    --ink-28:rgba(238,238,238,.28);
-    --rule:rgba(238,238,238,.32);
+    --paper:#1c1c1c; --card:#262626; --ink:#eeeeee;
+    --ink-70:rgba(238,238,238,.70); --ink-45:rgba(238,238,238,.45);
+    --ink-28:rgba(238,238,238,.28); --rule:rgba(238,238,238,.32);
   }
 
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none}
   body{
-    background:var(--paper);
-    color:var(--ink);
+    background:var(--paper);color:var(--ink);
     font-family:"EB Garamond",Georgia,"Times New Roman",serif;
-    font-size:17px;
-    line-height:1.45;
-    -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
+    font-size:17px;line-height:1.45;-webkit-font-smoothing:antialiased;
   }
 
-  .wrap{max-width:1500px;margin:0 auto;padding:68px 16px 120px}
-  @media (max-width:820px){ .wrap{padding:40px 16px 96px} }
-
-  h1{
-    font-weight:400;font-size:30px;line-height:1.1;margin:0 0 10px;
-    letter-spacing:.01em;
+  #stage{
+    position:fixed;inset:0;overflow:hidden;
+    cursor:grab;touch-action:none;
   }
-  .lede{max-width:52ch;color:var(--ink-70);margin:0 0 6px;font-size:17px}
-  .note{max-width:62ch;color:var(--ink-45);margin:18px 0 0;font-size:14.5px}
+  #stage.grabbing{cursor:grabbing}
+  #world{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+  #world svg.lines{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+  #world svg.lines path{fill:none;stroke:var(--rule);stroke-width:1.2}
+  #world svg.lines path.hedge{stroke-dasharray:3 5}
 
-  .nav{margin:16px 0 0;font-size:15px}
-  .nav a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
-  .axis{
-    margin:44px 0 10px;font-size:12.5px;letter-spacing:.14em;
-    text-transform:uppercase;color:var(--ink-45);
+  .ttl{
+    position:absolute;white-space:nowrap;pointer-events:none;
+    font-size:62px;line-height:1;color:var(--ink-28);letter-spacing:.02em;
   }
-
-  /* ——— chart ——— */
-  .chartwrap{position:relative}
-  .scroller{
-    overflow-x:auto;overflow-y:hidden;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:thin;scrollbar-color:var(--ink-28) transparent;
-  }
-  .scroller::-webkit-scrollbar{height:4px}
-  .scroller::-webkit-scrollbar-thumb{background:var(--ink-28)}
-  .scroller::-webkit-scrollbar-track{background:transparent}
-
-  .gutter{
-    position:absolute;right:0;top:0;bottom:0;z-index:5;
-    background:var(--paper);pointer-events:none;
-  }
-
-  .tree{position:relative}
-  .tree + .tree{margin-top:10px}
-
-  .tree svg.lines{position:absolute;inset:0;overflow:visible;pointer-events:none}
-  .tree svg.lines path{fill:none;stroke:var(--rule);stroke-width:1;vector-effect:non-scaling-stroke}
-
-  .initial{
-    position:absolute;right:10px;display:flex;align-items:center;
-    justify-content:flex-end;line-height:1;
-  }
+  .ttl i{display:block;font-size:14px;font-style:normal;letter-spacing:.16em;
+    text-transform:uppercase;margin-top:12px;color:var(--ink-28)}
 
   .node{
-    position:absolute;display:flex;flex-direction:column;align-items:center;
-    gap:7px;background:none;border:0;padding:0;margin:0;cursor:pointer;
-    color:var(--ink);font-family:inherit;
-    -webkit-tap-highlight-color:transparent;
+    position:absolute;display:flex;align-items:center;gap:11px;
+    background:none;border:0;padding:0;margin:0;cursor:pointer;
+    color:var(--ink);font-family:inherit;text-align:left;
   }
   .node:focus{outline:none}
-  .node:focus-visible .gl{text-decoration:underline;text-underline-offset:9px;text-decoration-thickness:1px}
-  .node .gl{
-    display:flex;align-items:center;justify-content:center;
-    line-height:1;transition:opacity .14s ease;
-  }
+  .node .gl{flex:0 0 auto;display:flex;align-items:center;justify-content:center;line-height:1}
+  .node .gl.none::after{content:"";display:block;width:62%;height:1px;background:var(--rule)}
   .node .gl svg{display:block;width:100%;height:100%}
-  .node .gl svg path{
-    fill:none;stroke:currentColor;stroke-width:6;
-    stroke-linecap:round;stroke-linejoin:round;
-  }
-  .node .cap{
-    font-size:10px;letter-spacing:.03em;color:var(--ink-45);
-    line-height:1.3;text-align:center;width:100%;
-    hyphens:none;
-  }
-  .node[aria-expanded="true"] .cap,.node:hover .cap{color:var(--ink-70)}
-  .tree.dim .node:not([aria-expanded="true"]) .gl{opacity:.42}
-  .tree.dim .node:not([aria-expanded="true"]) .cap{opacity:.42}
+  .node .gl svg path{fill:none;stroke:currentColor;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+  .node .tx{min-width:0;flex:1 1 auto}
+  .node .nm{display:block;line-height:1.14;font-size:15px}
+  .node .dt{display:block;color:var(--ink-45);line-height:1.2;margin-top:2px;font-size:11px}
+  .node:hover .nm,.node[aria-expanded="true"] .nm{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+  #world.dim .node:not([aria-expanded="true"]){opacity:.4}
 
-  .f-mod{font-family:"EB Garamond",Georgia,serif}
-  .f-cap{font-family:"Cinzel","EB Garamond",Georgia,serif}
-  .f-gk {font-family:"EB Garamond",Georgia,serif}
-  .f-ital{font-family:"Noto Sans Old Italic","EB Garamond",serif}
-  .f-phn{font-family:"Noto Sans Phoenician","EB Garamond",serif}
-  .f-egy{font-family:"Noto Sans Egyptian Hieroglyphs","EB Garamond",serif}
-  .f-bl {font-family:"UnifrakturMaguntia","EB Garamond",serif}
+  #head{
+    position:fixed;left:26px;top:24px;z-index:20;max-width:33ch;pointer-events:none;
+  }
+  #head h1{font-weight:400;font-size:25px;line-height:1.1;margin:0 0 6px}
+  #head p{margin:0;color:var(--ink-45);font-size:14.5px;line-height:1.42}
+  #head a{pointer-events:auto;color:var(--ink-70);text-decoration:underline;text-underline-offset:3px}
+  @media (max-width:700px){ #head{left:14px;top:12px;max-width:none;right:14px} #head h1{font-size:20px} }
 
-  /* ——— popup: plain text on the paper, no frame ——— */
   #pop{
     position:fixed;z-index:40;display:none;
-    width:344px;max-width:calc(100vw - 28px);
-    background:var(--card);
-    padding:20px 24px 22px;
+    width:368px;max-width:calc(100vw - 28px);
+    max-height:calc(100vh - 28px);overflow-y:auto;
+    background:var(--card);padding:20px 24px 22px;
+    scrollbar-width:thin;scrollbar-color:var(--ink-28) transparent;
   }
   #pop.on{display:block}
-  #pop .pg{
-    height:74px;margin-bottom:12px;display:flex;align-items:flex-end;
-    line-height:1;
-  }
+  #pop .pg{height:74px;margin-bottom:12px;display:flex;align-items:flex-end;line-height:1}
   #pop .pg svg{display:block;height:100%;width:74px}
   #pop .pg svg path{fill:none;stroke:currentColor;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
-  #pop .pt{font-size:21px;line-height:1.2;margin:0 0 3px}
-  #pop .pm{font-size:13px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-45);margin:0 0 11px}
+  #pop .pt{font-size:21px;line-height:1.2;margin:0 0 2px}
+  #pop .pl{font-size:16px;line-height:1.2;margin:0 0 7px;color:var(--ink-70);font-style:italic}
+  #pop .pm{font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-45);margin:0 0 11px}
   #pop .pd{font-size:16px;line-height:1.5;color:var(--ink-70);margin:0}
   #pop .pd + .pd{margin-top:9px}
-  #pop .pu{
-    font-size:13.5px;letter-spacing:.04em;color:var(--ink-45);margin:11px 0 0;
-    font-variant-numeric:tabular-nums;
-  }
+  #pop .pu{font-size:13px;letter-spacing:.04em;color:var(--ink-45);margin:11px 0 0;font-variant-numeric:tabular-nums}
   #pop .ps{margin:13px 0 0;font-size:14px}
-  #pop .ps a{
-    color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;
-    text-underline-offset:3px;display:inline-block;margin-right:14px;
-  }
-  #pop .ps a:hover{text-decoration-thickness:2px}
-  #pop .pclose{
-    display:none;margin-top:14px;background:none;border:0;padding:0;
-    font-family:inherit;font-size:14px;color:var(--ink-45);
-    text-decoration:underline;text-underline-offset:3px;cursor:pointer;
-  }
+  #pop .ps a{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;display:inline-block;margin-right:14px}
+  #pop .pclose{margin-top:14px;background:none;border:0;padding:0;font-family:inherit;font-size:14px;color:var(--ink-45);text-decoration:underline;text-underline-offset:3px;cursor:pointer;display:none}
   body.touch #pop .pclose{display:block}
 
-  footer{
-    margin-top:96px;padding-top:0;max-width:62ch;
-    font-size:14.5px;color:var(--ink-45);
-  }
-  footer h2{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;color:var(--ink-45);margin:0 0 12px}
-  footer p{margin:0 0 9px;line-height:1.5}
-  footer a{color:var(--ink-70);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+  .f-cun{font-family:"Noto Sans Cuneiform",serif}
+  .f-egy{font-family:"Noto Sans Egyptian Hieroglyphs",serif}
+  .f-uga{font-family:"Noto Sans Ugaritic",serif}
+  .f-phn{font-family:"Noto Sans Phoenician",serif}
+  .f-osa{font-family:"Noto Sans Old South Arabian",serif}
+  .f-eth{font-family:"Noto Sans Ethiopic",serif}
+  .f-sam{font-family:"Noto Sans Samaritan",serif}
+  .f-ara{font-family:"Noto Sans Imperial Aramaic",serif}
+  .f-heb{font-family:"Noto Sans Hebrew",serif}
+  .f-nab{font-family:"Noto Sans Nabataean",serif}
+  .f-arb{font-family:"Noto Sans Arabic",serif}
+  .f-pal{font-family:"Noto Sans Palmyrene",serif}
+  .f-syr{font-family:"Noto Sans Syriac",serif}
+  .f-man{font-family:"Noto Sans Mandaic",serif}
+  .f-sog{font-family:"Noto Sans Sogdian",serif}
+  .f-uyg{font-family:"Noto Serif Old Uyghur",serif}
+  .f-mon{font-family:"Noto Sans Mongolian",serif}
+  .f-ita{font-family:"Noto Sans Old Italic",serif}
+  .f-cop{font-family:"Noto Sans Coptic",serif}
+  .f-got{font-family:"Noto Sans Gothic",serif}
+  .f-gla{font-family:"Noto Sans Glagolitic",serif}
+  .f-arm{font-family:"Noto Sans Armenian",serif}
+  .f-geo{font-family:"Noto Sans Georgian",serif}
+  .f-lat{font-family:"EB Garamond",Georgia,serif}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Дерево букв</h1>
-  <p class="lede">Карта происхождения латинских букв, выстроенная как таймлайн. Слева — самое древнее: египетский иероглиф и протосинайский знак. Вправо — всё ближе к сегодняшнему дню.</p>
-  <p class="lede">Наведите на узел — или коснитесь его.</p>
-  <p class="nav"><a href="scripts.html">Дерево письменностей: откуда взялись все алфавиты мира →</a></p>
 
-  <p class="axis">← раньше · позже →</p>
-
-  <div class="chartwrap">
-    <div class="gutter" id="gutter"></div>
-    <div class="scroller" id="scroller">
-      <div id="chart"></div>
-    </div>
-  </div>
-
-  <p class="note" id="hint">Полотно прокручивается вбок: чем дальше влево, тем древнее. A, B, C — дальше тем же устройством.</p>
-
-  <footer>
-    <h2>О достоверности</h2>
-    <p>Все этапы и даты взяты из источников, ссылка есть у каждого узла. Там, где наука расходится или данных мало, это сказано прямо в описании, а не замазано.</p>
-    <p>Знаки показаны настоящими юникодными символами там, где они есть: египетская иероглифика <span class="f-egy">U+13000</span>…, финикийское письмо U+10900…, староиталийское (этрусское) U+10300…, греческий и латиница. Протосинайское письмо в Юникод не входит — <a href="https://www.unicode.org/L2/L2019/19299-revisiting-proto-sinaitic.pdf" target="_blank" rel="noopener">заявка L2/19-299</a> ещё обсуждается, — поэтому эти знаки и все палеографические начертания латиницы (рустичный капитал, римский курсив, унциал, полуунциал, каролингский минускул) нарисованы скелетными контурами по описаниям и прорисовкам из источников. Это схемы начертания, а не факсимиле почерка.</p>
-    <p>Основные источники: <a href="https://en.wikipedia.org/wiki/History_of_the_Latin_script" target="_blank" rel="noopener">History of the Latin script</a>, <a href="https://en.wikipedia.org/wiki/Proto-Sinaitic_script" target="_blank" rel="noopener">Proto-Sinaitic script</a>, <a href="https://en.wikipedia.org/wiki/Phoenician_alphabet" target="_blank" rel="noopener">Phoenician alphabet</a>, <a href="https://en.wikipedia.org/wiki/Archaic_Greek_alphabets" target="_blank" rel="noopener">Archaic Greek alphabets</a>, <a href="https://en.wikipedia.org/wiki/Old_Italic_scripts" target="_blank" rel="noopener">Old Italic scripts</a>, <a href="https://en.wikipedia.org/wiki/Uncial_script" target="_blank" rel="noopener">Uncial script</a>, <a href="https://en.wikipedia.org/wiki/Carolingian_minuscule" target="_blank" rel="noopener">Carolingian minuscule</a>, <a href="https://www.unicode.org/charts/" target="_blank" rel="noopener">кодовые таблицы Unicode</a>.</p>
-    <p>Исходник открыт: <a href="https://github.com/menshchikovpavel-debug/letter-family-tree" target="_blank" rel="noopener">github.com/menshchikovpavel-debug/letter-family-tree</a></p>
-  </footer>
-</div>
-
+<div id="head"></div>
+<div id="stage"><div id="world"></div></div>
 <div id="pop" role="dialog" aria-live="polite"></div>
 
 <script>
 (function(){
 "use strict";
 
-/* ——————————————————————————————————————————————————————
-   Скелетные начертания. viewBox 0 0 100 100, только штрихи.
-   —————————————————————————————————————————————————————— */
-var P = {
-  /* A */
-  ps_alp:  ["M34 46 L66 46","M34 46 L50 84 L66 46",
-            "M34 46 C22 40 14 26 18 13","M66 46 C78 40 86 26 82 13"],
-  gk_a_arch:["M14 50 L84 20","M14 50 L84 80","M54 33 L54 67"],
-  gk_a_west:["M54 14 L22 86","M54 14 L78 86","M34 60 L69 60"],
-  lat_A_old:["M58 14 L20 86","M58 14 L76 86","M37 54 L70 64"],
-  rust_A:  ["M50 12 C46 40 42 64 38 84","M50 12 C54 40 58 68 60 92","M42 58 L58 58"],
-  orc_a:   ["M44 16 C58 11 70 14 72 21","M44 16 L28 60 C25 77 46 87 64 78","M72 19 L72 81"],
-  nrc_a:   ["M66 40 C56 30 34 32 28 48 C22 66 36 80 52 76 C60 74 66 66 66 58","M66 30 L66 80"],
-  unc_A:   ["M72 18 C44 24 26 44 26 62 C26 78 44 84 60 76 C68 72 72 66 72 58","M72 18 L72 80"],
-  hunc_a:  ["M66 42 C58 33 39 33 32 46 C25 61 34 78 50 78 C60 78 66 71 66 61","M66 36 L66 80"],
-  car_a:   ["M68 47 C60 37 40 37 33 50 C26 65 35 79 51 79 C62 79 68 71 68 62","M68 30 L68 81"],
+/* ═══ язык: регион, затем язык браузера. Переключателя нет, но ?lang= работает ═══ */
+function pickLang(){
+  var q = (location.search.match(/[?&]lang=(ru|en)/) || [])[1];
+  if(q) return q;
+  var tz = '';
+  try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; }catch(e){}
+  var RU = /^(Europe\/(Moscow|Kaliningrad|Samara|Volgograd|Saratov|Astrakhan|Ulyanovsk|Kirov|Minsk)|Asia\/(Yekaterinburg|Omsk|Novosibirsk|Barnaul|Tomsk|Novokuznetsk|Krasnoyarsk|Irkutsk|Chita|Yakutsk|Khandyga|Vladivostok|Ust-Nera|Magadan|Sakhalin|Srednekolymsk|Kamchatka|Anadyr|Almaty|Bishkek|Tashkent))$/;
+  if(RU.test(tz)) return 'ru';
+  var langs = (navigator.languages || [navigator.language || '']).join(',').toLowerCase();
+  if(/\b(ru|be|kk|ky)(-|,|$)/.test(langs)) return 'ru';
+  return 'en';
+}
+var LANG = pickLang();
+document.documentElement.lang = LANG;
+function T(pair){ return !pair ? '' : (LANG === 'ru' ? pair[0] : pair[1]); }
 
-  /* B */
-  ps_bet:  ["M76 24 L24 24 L24 80 L76 80 L76 62","M76 24 L76 42"],
-  gk_b_arch:["M28 14 L28 86","M28 14 L62 24 L28 48","M28 48 L66 60 L28 86"],
-  gk_b_west:["M30 14 L30 86","M30 14 C62 14 66 44 30 48","M30 48 C68 48 72 86 30 86"],
-  lat_B_old:["M30 14 L30 86","M30 14 C56 16 58 40 30 44","M30 44 C66 46 68 86 30 86"],
-  rust_B:  ["M36 12 C34 40 32 64 30 88","M36 12 C54 14 56 36 34 42","M34 42 C58 44 60 82 31 84"],
-  orc_b:   ["M62 12 L62 82","M62 38 C40 34 28 48 32 62 C36 76 54 78 62 70"],
-  nrc_b:   ["M30 12 L30 80","M30 44 C46 34 66 40 66 56 C66 72 46 82 30 74"],
-  unc_B:   ["M32 10 L32 84","M32 10 C52 12 54 30 32 36","M32 36 C68 38 70 86 32 84"],
-  hunc_b:  ["M30 10 L30 80","M30 42 C46 32 68 40 68 58 C68 76 46 84 30 74"],
-  car_b:   ["M30 8 L30 80","M30 46 C44 36 66 42 66 60 C66 76 46 84 30 76"],
-
-  /* C и G */
-  ps_gaml: ["M22 78 L50 28 C56 18 70 16 80 22"],
-  gk_g_arch:["M50 16 L24 84","M50 16 L74 84"],
-  gk_g_west:["M74 22 L36 36 L30 52 L38 68 L74 78"],
-  lat_C_old:["M74 24 C56 12 26 20 26 50 C26 80 56 88 74 76"],
-  rust_C:  ["M66 20 C52 12 34 22 34 50 C34 78 52 88 66 80"],
-  orc_c:   ["M70 26 C52 16 30 26 32 50 C34 74 54 82 70 72"],
-  nrc_c:   ["M68 38 C58 30 40 32 36 46 C32 62 44 76 60 74 C64 73 67 70 69 66"],
-  unc_C:   ["M72 26 C56 14 24 20 24 50 C24 80 56 86 72 74"],
-  hunc_c:  ["M70 36 C58 26 36 28 32 46 C28 64 42 78 60 74 C65 73 68 70 70 66"],
-  car_c:   ["M70 40 C60 30 40 32 36 48 C32 64 44 76 60 72 C65 71 68 68 70 64"],
-  lat_G:   ["M74 24 C56 12 26 20 26 50 C26 78 54 88 72 78","M72 54 L72 78"],
-  unc_g:   ["M34 30 L66 30","M42 30 C36 44 40 54 56 54 C70 54 74 72 60 82 C50 89 40 86 36 80"],
-  car_g:   ["M62 40 C56 32 40 32 34 42 C28 54 38 64 50 62 C58 61 62 56 62 48",
-            "M62 38 C62 50 60 58 62 66 C64 78 52 86 38 82",
-            "M62 38 C66 32 72 32 76 36"]
+var UI = {
+  title:['Карта букв','Letter Map'],
+  sub:['Три первые буквы алфавита — ʾалеф, бет, гимель — и всё, во что они превратились. Слева древнее, справа сегодняшнее.',
+       'The first three letters of the alphabet — ʾaleph, beth, gimel — and everything they turned into. Oldest on the left, today on the right.'],
+  hint:['Тяните карту, щипок — масштаб. Наведите на узел. Клавиша 0 — вернуть обзор.',
+        'Drag to pan, pinch to zoom. Hover a node. Press 0 to fit.'],
+  links:['<a href="latin.html">Латиница по этапам</a> · <a href="scripts.html">Дерево письменностей</a>',
+         '<a href="latin.html">Latin, stage by stage</a> · <a href="scripts.html">Tree of scripts</a>'],
+  close:['закрыть','close'],
+  today:['Сегодня','Today'],
+  noUni:['знака нет: блока в Юникоде нет','no sign: no Unicode block'],
+  letters:[['ʾАЛЕФ','БЫК','ʾALEPH','OX'],['БЕТ','ДОМ','BETH','HOUSE'],['ГИМЕЛЬ','МЕТАТЕЛЬНАЯ ПАЛКА','GIMEL','THROWSTICK']]
 };
 
-function svgGlyph(key){
-  var d = P[key] || [];
-  return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
-    d.map(function(p){ return '<path d="'+p+'"/>'; }).join('') + '</svg>';
-}
+var OX = ["M34 46 L66 46","M34 46 L50 84 L66 46","M34 46 C22 40 14 26 18 13","M66 46 C78 40 86 26 82 13"];
+function svgOx(){ return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
+  OX.map(function(p){ return '<path d="'+p+'"/>'; }).join('') + '</svg>'; }
 
-/* glyph descriptors */
-function S(key){ return {k:'svg', v:key}; }                    /* нарисованный контур */
-function U(ch, cls, scale){ return {k:'txt', v:ch, c:cls, s:scale||1}; }  /* настоящий символ */
+var W = function(slug, ru, en){ return [[ru||('Wikipedia: '+slug.replace(/_/g,' ')), en||('Wikipedia: '+slug.replace(/_/g,' '))],
+       'https://en.wikipedia.org/wiki/'+slug]; };
+var UC = function(hex){ return [['Unicode '+hex,'Unicode '+hex], 'https://www.unicode.org/charts/PDF/U'+hex+'.pdf']; };
 
-function glyphHTML(g, px){
-  if(g.k === 'svg'){
-    return '<span class="gl" style="width:'+px+'px;height:'+px+'px">'+svgGlyph(g.v)+'</span>';
-  }
-  var fs = Math.round(px * (g.s||1));
-  return '<span class="gl '+g.c+'" style="width:'+px+'px;height:'+px+
-         'px;font-size:'+fs+'px">'+g.v+'</span>';
-}
+/* ═══ письменности: описание пишется один раз на все три буквы ═══ */
+var SC = {
+ cun:{n:['Клинопись','Cuneiform'], d:['с конца IV тыс. до н. э.','from the late 4th mill. BCE'],
+   m:['Шумер, Месопотамия','Sumer, Mesopotamia'],
+   x:[['Древнейшее известное письмо. Алфавиту оно НЕ предок: в справочнике у клинописи прямо указано «дочерних систем нет; повлияла на форму знаков угаритского и древнеперсидского».',
+       'The earliest known writing. It is NOT an ancestor of the alphabet: the reference states flatly that cuneiform has "no child systems; influenced the shape of Ugaritic and Old Persian glyphs".'],
+      ['Единственная ниточка к нашему дереву — осторожное предположение, что шумерское протописьмо повлияло на появление египетской иероглифики: она «возникла немного позже и, вероятно, была изобретена под его влиянием». Определённого вывода о происхождении иероглифики нет. Поэтому на карте эта связь показана пунктиром.',
+       'The one thread to our tree is a hedged suggestion that Sumerian proto-writing influenced the rise of Egyptian hieroglyphs: they "came into existence a little after [Sumerian script], and, probably, [were] invented under the influence of the latter". No definitive determination has been made. Hence the dotted line on this map.']],
+   u:'U+12000–U+123FF', s:[W('Cuneiform'), UC('12000')]},
 
-/* ——————————————————————————————————————————————————————
-   Источники
-   —————————————————————————————————————————————————————— */
-var SRC = {
-  wA:     ['Wikipedia: A','https://en.wikipedia.org/wiki/A'],
-  wB:     ['Wikipedia: B','https://en.wikipedia.org/wiki/B'],
-  wC:     ['Wikipedia: C','https://en.wikipedia.org/wiki/C'],
-  wG:     ['Wikipedia: G','https://en.wikipedia.org/wiki/G'],
-  aleph:  ['Wikipedia: Aleph','https://en.wikipedia.org/wiki/Aleph'],
-  bet:    ['Wikipedia: Bet','https://en.wikipedia.org/wiki/Bet_(letter)'],
-  gimel:  ['Wikipedia: Gimel','https://en.wikipedia.org/wiki/Gimel'],
-  alpha:  ['Wikipedia: Alpha','https://en.wikipedia.org/wiki/Alpha'],
-  beta:   ['Wikipedia: Beta','https://en.wikipedia.org/wiki/Beta'],
-  gamma:  ['Wikipedia: Gamma','https://en.wikipedia.org/wiki/Gamma'],
-  psin:   ['Wikipedia: Proto-Sinaitic script','https://en.wikipedia.org/wiki/Proto-Sinaitic_script'],
-  l2:     ['Unicode L2/19-299','https://www.unicode.org/L2/L2019/19299-revisiting-proto-sinaitic.pdf'],
-  phn:    ['Wikipedia: Phoenician alphabet','https://en.wikipedia.org/wiki/Phoenician_alphabet'],
-  uphn:   ['Unicode: Phoenician (U+10900)','https://www.unicode.org/charts/PDF/U10900.pdf'],
-  uital:  ['Unicode: Old Italic (U+10300)','https://www.unicode.org/charts/PDF/U10300.pdf'],
-  uegy:   ['Unicode: Egyptian Hieroglyphs','https://www.unicode.org/charts/PDF/U13000.pdf'],
-  ugrk:   ['Unicode: Greek (U+0370)','https://www.unicode.org/charts/PDF/U0370.pdf'],
-  ulat:   ['Unicode: Basic Latin','https://www.unicode.org/charts/PDF/U0000.pdf'],
-  arch:   ['Wikipedia: Archaic Greek alphabets','https://en.wikipedia.org/wiki/Archaic_Greek_alphabets'],
-  ital:   ['Wikipedia: Old Italic scripts','https://en.wikipedia.org/wiki/Old_Italic_scripts'],
-  etr:    ['Wikipedia: Etruscan language','https://en.wikipedia.org/wiki/Etruscan_language'],
-  hist:   ['Wikipedia: History of the Latin script','https://en.wikipedia.org/wiki/History_of_the_Latin_script'],
-  duenos: ['Wikipedia: Duenos inscription','https://en.wikipedia.org/wiki/Duenos_inscription'],
-  sqcap:  ['Wikipedia: Roman square capitals','https://en.wikipedia.org/wiki/Roman_square_capitals'],
-  rust:   ['Wikipedia: Rustic capitals','https://en.wikipedia.org/wiki/Rustic_capitals'],
-  curs:   ['Wikipedia: Roman cursive','https://en.wikipedia.org/wiki/Roman_cursive'],
-  unc:    ['Wikipedia: Uncial script','https://en.wikipedia.org/wiki/Uncial_script'],
-  hunc:   ['Wikipedia: Half-uncial','https://en.wikipedia.org/wiki/Half-uncial'],
-  caro:   ['Wikipedia: Carolingian minuscule','https://en.wikipedia.org/wiki/Carolingian_minuscule'],
-  hum:    ['Wikipedia: Humanist minuscule','https://en.wikipedia.org/wiki/Humanist_minuscule'],
-  black:  ['Wikipedia: Blackletter','https://en.wikipedia.org/wiki/Blackletter'],
-  gard:   ['Gardiner’s sign list','https://en.wikipedia.org/wiki/Gardiner%27s_sign_list'],
-  pr:     ['Wikipedia: Pr (hieroglyph)','https://en.wikipedia.org/wiki/Pr_(hieroglyph)'],
-  throw:  ['Wikipedia: Throw stick (hieroglyph)','https://en.wikipedia.org/wiki/Throw_stick_(hieroglyph)'],
-  serab:  ['Wikipedia: Serabit el-Khadim','https://en.wikipedia.org/wiki/Serabit_el-Khadim'],
-  ruga:   ['Wikipedia: Spurius Carvilius Ruga','https://en.wikipedia.org/wiki/Spurius_Carvilius_Ruga'],
-  insul:  ['Wikipedia: Insular script','https://en.wikipedia.org/wiki/Insular_script']
+ egy:{n:['Египетская иероглифика','Egyptian hieroglyphs'], d:['с XXXII в. до н. э.','from the 32nd c. BCE'],
+   m:['Египет','Egypt'],
+   x:[['Алфавит родился из неё не прямым наследованием, а трюком: несколько знаков взяли ради ПЕРВОГО звука их египетского названия, забыв про смысл рисунка.',
+       'The alphabet came out of it not by inheritance but by a trick: a few signs were taken for the FIRST sound of their Egyptian name, dropping what the picture meant.']],
+   u:'U+13000–U+1342F', s:[W('Egyptian_hieroglyphs'), UC('13000')]},
+
+ psin:{n:['Протосинайское письмо','Proto-Sinaitic script'], d:['XIX–XVI вв. до н. э.','19th–16th c. BCE'],
+   m:['Синай, Серабит-эль-Хадим','Sinai, Serabit el-Khadim'],
+   x:[['Корень всего дерева: бирюзовые копи на Синае и Вади-эль-Холь в Среднем Египте. Датировка спорна — ранняя около 1850 г. до н. э., поздняя около 1550 г. до н. э.',
+       'The root of the whole tree: turquoise mines in Sinai and Wadi el-Hol in Middle Egypt. The dating is disputed — an early date around 1850 BCE, a late one around 1550 BCE.'],
+      ['В Юникод не входит, заявка L2/19-299 ещё обсуждается. Знаки нарисованы контуром по прорисовкам из источника; в разных надписях они расходятся сильно.',
+       'Not in Unicode; proposal L2/19-299 is still under discussion. The signs here are drawn from the published tracings, and they vary a lot between inscriptions.']],
+   u:'', s:[W('Proto-Sinaitic_script'), [['Unicode L2/19-299','Unicode L2/19-299'],'https://www.unicode.org/L2/L2019/19299-revisiting-proto-sinaitic.pdf']]},
+
+ ugar:{n:['Угаритский алфавит','Ugaritic alphabet'], d:['ок. 1400–1190 до н. э.','c. 1400–1190 BCE'],
+   m:['Угарит, Рас-Шамра, Сирия','Ugarit, Ras Shamra, Syria'],
+   x:[['Вот она, связь с клинописью. Это настоящий алфавит из 30 букв, но выдавленный клином по глине. «То, что угаритское письмо клинописное и что направление письма у него то же, что у других клинописных систем, поддерживает гипотезу, что оно было напрямую вдохновлено клинописной системой вроде аккадской».',
+       'Here is the link to cuneiform. A real 30-letter alphabet, but pressed into clay with a wedge stylus. "The facts that the Ugaritic alphabet is written in cuneiform and that it has been found to overwhelmingly follow the same writing direction as other cuneiform systems both support the hypothesis that Ugaritic was directly inspired by a cuneiform system such as Akkadian cuneiform."'],
+      ['Финикийскому оно не предок, а двоюродный брат: обе ветви идут от протосинайского, и обе отметки стоят со знаком вопроса. Зато именно угаритские абецедарии дают «древнейшее прямое свидетельство не только порядка „abc“, но и порядка „hlḥm“» — то есть обоих алфавитных порядков сразу.',
+       'It is not an ancestor of Phoenician but a cousin: both branch off Proto-Sinaitic, and both links carry a question mark. What Ugarit does give is the abecedaries — "the earliest direct evidence of not just the ‘abc’ alphabetical order but also the ‘hlḥm’ order", both at once.'],
+      ['Осторожность источника стоит повторить: «из-за простой и крайне абстрактной природы угаритских знаков легко найти графические сходства с многими другими письменностями того времени».',
+       'The source’s own caution is worth repeating: "due to the simple and highly abstract nature of Ugaritic characters, it is easy to find graphical similarities and phonological matches with many other scripts of the time."']],
+   u:'U+10380–U+1039F', s:[W('Ugaritic_alphabet'), UC('10380')]},
+
+ phn:{n:['Финикийское письмо','Phoenician alphabet'], d:['XII в. до н. э.','12th c. BCE'],
+   m:['Финикия','Phoenicia'],
+   x:[['22 согласных знака, справа налево, гласных нет вовсе. Главная развилка: отсюда уходят арамейская и греческая ветви, а с ними почти всё остальное.',
+       'Twenty-two consonant signs, right to left, no vowels at all. The great fork: the Aramaic and Greek branches leave from here, and with them nearly everything else.']],
+   u:'U+10900–U+1091F', s:[W('Phoenician_alphabet'), UC('10900')]},
+
+ osa:{n:['Древнеюжноаравийское','Ancient South Arabian'], d:['конец II тыс. до н. э.','late 2nd mill. BCE'],
+   m:['Йемен','Yemen'],
+   x:[['Не потомок финикийского, а его брат: «отделилось от протосинайского письма примерно в конце II тысячелетия до н. э.» и названо «сестринским письмом финикийского алфавита».',
+       'Not a descendant of Phoenician but its sibling: it "branched from the Proto-Sinaitic script in about the late 2nd millennium BCE" and is called "a sibling script of the Phoenician alphabet".'],
+      ['Важно для этой карты: здесь другой алфавитный порядок — halaḥam, а не abgd. Поэтому ʾалеф, бет и гимель тут не первые три буквы, а просто буквы.',
+       'Important here: this branch uses a different alphabetical order — halaḥam, not abgd. So ʾaleph, beth and gimel are not its first three letters, just letters.']],
+   u:'U+10A60–U+10A7F', s:[W('Ancient_South_Arabian_script'), UC('10A60')]},
+
+ geez:{n:['Эфиопское письмо (геэз)','Geʽez script'], d:['с I в. н. э.','from the 1st c. CE'],
+   m:['Эфиопия и Эритрея','Ethiopia and Eritrea'],
+   x:[['«Единственное сохранившееся письмо, происходящее от древнеюжноаравийского». Около IV века превратилось из консонантного в слоговое — редчайший случай смены типа письма на ходу.',
+       '"The sole extant writing system that derives from ASA." Around the 4th century it turned from an abjad into a syllabary — a very rare change of type in mid-life.']],
+   u:'U+1200–U+137F', s:[W('Ge%CA%BDez_script'), UC('1200')]},
+
+ paleo:{n:['Палеоеврейское письмо','Paleo-Hebrew'], d:['X в. до н. э. — 135 г.','10th c. BCE – 135 CE'],
+   m:['Древний Израиль','Ancient Israel'],
+   x:[['«Первоначальный еврейский алфавит, выведенный напрямую из финикийского». Юникод не дал ему своего блока — кодируется финикийским, поэтому знак тот же.',
+       '"The original Hebrew alphabet derived directly from the Phoenician alphabet." Unicode gave it no block of its own — it is encoded as Phoenician, so the sign shown is the same.']],
+   u:'', s:[W('Paleo-Hebrew_alphabet')]},
+
+ sam:{n:['Самаритянское письмо','Samaritan script'], d:['с VI в. до н. э.','from the 6th c. BCE'],
+   m:['Самаряне','Samaritans'],
+   x:[['Потомок палеоеврейского, а не арамейского: самаряне сохранили ту форму букв, от которой евреи отказались.',
+       'A descendant of Paleo-Hebrew, not of Aramaic: the Samaritans kept the letter shapes the Jews gave up.']],
+   u:'U+0800–U+083F', s:[W('Samaritan_script'), UC('0800')]},
+
+ aram:{n:['Арамейское письмо','Aramaic alphabet'], d:['VIII в. до н. э.','8th c. BCE'],
+   m:['Арамеи, затем держава Ахеменидов','Arameans, then the Achaemenid Empire'],
+   x:[['«Древнейшие надписи на арамейском языке сделаны финикийским алфавитом. Со временем он развился в арамейский алфавит — к VIII веку до н. э.»',
+       '"The earliest inscriptions in the Aramaic language use the Phoenician alphabet. Over time, the alphabet developed into the Aramaic alphabet by the 8th century BC."'],
+      ['Канцелярское письмо персидской державы разнесло его от Египта до Индии. Второй по важности узел дерева после финикийского.',
+       'As the chancery script of the Persian empire it travelled from Egypt to India. The second most important node on this map after Phoenician.']],
+   u:'U+10840–U+1085F', s:[W('Aramaic_alphabet'), UC('10840')]},
+
+ heb:{n:['Еврейское квадратное письмо','Hebrew square script'], d:['III–I вв. до н. э.','3rd–1st c. BCE'],
+   m:['Евреи','Jews'],
+   x:[['«Стилизованная форма арамейского алфавита», вытеснившая палеоеврейское письмо. Даты в источниках расходятся: II–I вв. до н. э., 135 г. н. э. или III в. до н. э.',
+       '"A stylized form of the Aramaic alphabet", which displaced Paleo-Hebrew. The sources disagree on the date: 2nd–1st c. BCE, 135 CE, or 3rd c. BCE.']],
+   u:'U+0590–U+05FF', s:[W('Hebrew_alphabet'), UC('0590')]},
+
+ nab:{n:['Набатейское письмо','Nabataean script'], d:['II в. до н. э. — IV в. н. э.','2nd c. BCE – 4th c. CE'],
+   m:['Петра, Мадаин-Салих','Petra, Mada’in Saleh'],
+   x:[['Узкое горлышко истории: «скорописная форма набатейского развилась в арабский алфавит начиная с IV века». Через маленький торговый народ прошёл путь к письму полутора миллиардов человек.',
+       'A bottleneck of history: "a cursive form of Nabataean developed into the Arabic alphabet from the 4th century". The route to the script of one and a half billion people ran through one small trading nation.']],
+   u:'U+10880–U+108AF', s:[W('Nabataean_script'), UC('10880')]},
+
+ arab:{n:['Арабское письмо','Arabic script'], d:['III–IV вв.','3rd–4th c. CE'],
+   m:['Аравия','Arabia'],
+   x:[['Второе в мире по распространённости. «Большинство лингвистов полагают, что оно развилось из набатейского письма в IV веке».',
+       'The second most widely used script in the world. "Most linguists believe [it] developed from the Nabataean script in the fourth century AD."']],
+   u:'U+0600–U+06FF', s:[W('Arabic_alphabet'), UC('0600')]},
+
+ palm:{n:['Пальмирское письмо','Palmyrene alphabet'], d:['с I в. до н. э.','from the 1st c. BCE'],
+   m:['Пальмира, Сирия','Palmyra, Syria'],
+   x:[['Арамейская скоропись торгового города в сирийской пустыне; промежуточное звено к сирийскому письму.',
+       'The Aramaic cursive of a caravan city in the Syrian desert; the step between Aramaic and Syriac.']],
+   u:'U+10860–U+1087F', s:[W('Palmyrene_alphabet'), UC('10860')]},
+
+ syr:{n:['Сирийское письмо','Syriac alphabet'], d:['с I в. н. э.','from the 1st c. CE'],
+   m:['Сирия, Месопотамия','Syria, Mesopotamia'],
+   x:[['«Один из семитских абджадов, происходящих от арамейского алфавита через пальмирский». Общая схема алфавитов, правда, ставит предком прямо арамейское — источники расходятся.',
+       '"One of the Semitic abjads descending from the Aramaic alphabet through the Palmyrene alphabet." The general alphabet chart, though, puts Aramaic directly as the parent — the sources disagree.']],
+   u:'U+0700–U+074F', s:[W('Syriac_alphabet'), UC('0700')]},
+
+ mand:{n:['Мандейское письмо','Mandaic script'], d:['II–VII вв.','2nd–7th c. CE'],
+   m:['Южная Месопотамия','southern Mesopotamia'],
+   x:[['Прямой потомок арамейского. Живо как богослужебное у мандеев — последней уцелевшей гностической общины.',
+       'A direct descendant of Aramaic. Still alive liturgically among the Mandaeans, the last surviving Gnostic community.']],
+   u:'U+0840–U+085F', s:[W('Mandaic_script'), UC('0840')]},
+
+ sogd:{n:['Согдийское письмо','Sogdian alphabet'], d:['II–XII вв.','2nd–12th c. CE'],
+   m:['Великий шёлковый путь','the Silk Road'],
+   x:[['Письмо купцов шёлкового пути. Здесь строка поворачивается на 90 градусов и начинает идти сверху вниз.',
+       'The script of the Silk Road merchants. Here the line turns ninety degrees and starts running top to bottom.']],
+   u:'U+10F30–U+10F6F', s:[W('Sogdian_alphabet'), UC('10F30')]},
+
+ uyg:{n:['Древнеуйгурское письмо','Old Uyghur alphabet'], d:['VIII–XVIII вв.','8th–18th c.'],
+   m:['Центральная Азия','Central Asia'],
+   x:[['«Уйгуры развернули согдийское письмо» — и в развёрнутом виде передали его дальше, монголам.',
+       '"The Uyghurs rotated their Sogdian-derived script" — and passed it on in that rotated form to the Mongols.']],
+   u:'U+10F70–U+10FAF', s:[W('Old_Uyghur_alphabet'), UC('10F70')]},
+
+ mong:{n:['Старомонгольское письмо','Mongolian script'], d:['с 1204 г.','from c. 1204'],
+   m:['Монгольское плато','the Mongolian Plateau'],
+   x:[['«Тата-тонга, уйгурский писец XIII века, захваченный Чингисханом, принёс древнеуйгурский алфавит на Монгольское плато». С 2025 года снова официальное письмо Монголии.',
+       '"Tata-tonga, a 13th-century Uyghur scribe captured by Genghis Khan, was responsible for bringing the Old Uyghur alphabet to the Mongolian Plateau." Co-official in Mongolia again since 2025.'],
+      ['Единственное письмо в мире, которое идёт вертикальными строками слева направо. Здесь знак показан в изолированной форме.',
+       'The only script in the world written in vertical lines running left to right. The sign here is shown in its isolated form.']],
+   u:'U+1800–U+18AF', s:[W('Mongolian_script'), UC('1800')]},
+
+ grk:{n:['Греческий алфавит','Greek alphabet'], d:['ок. 800 г. до н. э.','c. 800 BCE'],
+   m:['Греция','Greece'],
+   x:[['«Греки переняли алфавит у более раннего финикийского, называя его Φοινικήια γράμματα — финикийские письмена».',
+       '"The Greeks adopted the alphabet from the earlier Phoenician alphabet... calling it Φοινικήια γράμματα ‘Phoenician letters’."'],
+      ['Здесь переворот: «финикийский алфавит ограничивался согласными. Когда его приспособили для записи греческого, некоторые согласные были переделаны, чтобы выражать гласные». Первые в истории буквы для гласных.',
+       'The turning point: "the Phoenician alphabet was limited to consonants. When it was adopted for writing Greek, certain consonants were adapted in order to express vowels." The first vowel letters in history.']],
+   u:'U+0370–U+03FF', s:[W('Greek_alphabet'), UC('0370')]},
+
+ etr:{n:['Этрусское письмо','Etruscan script'], d:['VII в. до н. э.','7th c. BCE'],
+   m:['Этрурия, Италия','Etruria, Italy'],
+   x:[['Этруски взяли западный («красный») греческий алфавит через колонии Кумы и Питекусы. Буквы b, d, g и o они протащили дальше, почти ими не пользуясь: в этрусском не было звонких смычных.',
+       'The Etruscans took the western ("red") Greek alphabet through the colonies of Cumae and Pithekoussai. They carried b, d, g and o onward while barely using them: Etruscan had no voiced stops.']],
+   u:'U+10300–U+1032F', s:[W('Old_Italic_scripts'), UC('10300')]},
+
+ lat:{n:['Латиница','Latin alphabet'], d:['VII в. до н. э. — сегодня','7th c. BCE – today'],
+   m:['Лаций, затем весь мир','Latium, then the world'],
+   x:[['Самое распространённое письмо на Земле. Подробная история каждой буквы — монументальный капитал, рустика, римский курсив, унциал, полуунциал, каролингский минускул, готика, гуманисты — на соседней странице.',
+       'The most widely used script on Earth. The stage-by-stage history of each letter — monumental capitals, rustic, Roman cursive, uncial, half-uncial, Carolingian minuscule, blackletter, the humanists — is on the companion page.']],
+   u:'U+0041 · U+0042 · U+0043', s:[W('Latin_script'), [['Латиница по этапам','Latin, stage by stage'],'latin.html']]},
+
+ copt:{n:['Коптское письмо','Coptic script'], d:['II–III вв.','2nd–3rd c. CE'],
+   m:['Египет','Egypt'],
+   x:[['«Набор знаков основан на унциальном греческом алфавите, дополненном буквами, заимствованными из египетского демотического письма».',
+       '"The repertoire of glyphs is based on the uncial Greek alphabet, augmented by letters borrowed from the Egyptian Demotic."'],
+      ['Красивая петля: письмо ушло из Египта через Синай и Грецию и вернулось обратно, прихватив по дороге несколько родных знаков.',
+       'A neat loop: the script left Egypt through Sinai and Greece and came back, picking up a few of its native signs on the way.']],
+   u:'U+2C80–U+2CFF', s:[W('Coptic_script'), UC('2C80')]},
+
+ goth:{n:['Готское письмо','Gothic alphabet'], d:['ок. 350 г.','c. 350 CE'],
+   m:['Готы','the Goths'],
+   x:[['«Разработано в IV веке Ульфилой, готским проповедником каппадокийско-греческого происхождения, ради перевода Библии». «Происхождение готского алфавита спорно»: спорят о роли латиницы и рун.',
+       '"Developed in the 4th century AD by Ulfilas, a Gothic preacher of Cappadocian Greek descent, for the purpose of translating the Bible." "The origin of the Gothic alphabet is controversial": the roles of Latin and the runes are debated.']],
+   u:'U+10330–U+1034F', s:[W('Gothic_alphabet'), UC('10330')]},
+
+ glag:{n:['Глаголица','Glagolitic script'], d:['862–863 гг.','862–863 CE'],
+   m:['Великая Моравия','Great Moravia'],
+   x:[['«Создана в IX веке для перевода греческих богослужебных текстов на старославянский Кириллом, христианским монахом из Фессалоник». «Двадцать четыре из 41 буквы, вероятно, происходят от графем средневекового греческого курсивного минускула».',
+       '"Created in the 9th century for the purpose of translating Greek liturgical texts into Old Church Slavonic by Cyril, a Christian monk from Thessalonica." "Twenty-four of the 41 original Glagolitic letters probably derive from graphemes of the medieval cursive Greek small alphabet."']],
+   u:'U+2C00–U+2C5F', s:[W('Glagolitic_script'), UC('2C00')]},
+
+ cyr:{n:['Кириллица','Cyrillic script'], d:['890-е гг.','the 890s'],
+   m:['Преславская школа, Болгария','Preslav school, Bulgaria'],
+   x:[['Предок кириллицы — не глаголица, а греческое письмо: «кириллица происходит от букв греческого унциального письма, дополненных лигатурами и согласными из более старой глаголицы для звуков, которых не было в греческом».',
+       'The parent of Cyrillic is not Glagolitic but Greek: "the Cyrillic script is derived from the Greek uncial script letters, augmented by ligatures and consonants from the older Glagolitic alphabet for sounds not found in Greek."'],
+      ['И сделал её не Кирилл: «ученики Кирилла и Мефодия развили кириллицу из греческих букв в 890-е годы»; названа она в его честь.',
+       'And Cyril did not make it: "it was his students that developed Cyrillic from the Greek letters in the 890s"; it was named in his honour.']],
+   u:'U+0400–U+04FF', s:[W('Cyrillic_script'), UC('0400')]},
+
+ arm:{n:['Армянское письмо','Armenian alphabet'], d:['405 г.','405 CE'],
+   m:['Армения, Месроп Маштоц','Armenia, Mesrop Mashtots'],
+   x:[['Один из немногих алфавитов с точной датой рождения. «Общее мнение состоит в том, что армянское письмо смоделировано по греческому алфавиту, дополненному буквами из другого источника». Альтернативы — пехлеви и сирийское.',
+       'One of the few alphabets with an exact birth date. "The general consensus is that Armenian is modeled after the Greek alphabet, supplemented with letters from a different source or sources." The alternatives named are Pahlavi and Syriac.'],
+      ['Имена первых букв — айб, бен, гим — тот же ряд ʾалеф-бет-гимель.',
+       'The names of its first letters — ayb, ben, gim — are the same ʾaleph-beth-gimel series.']],
+   u:'U+0530–U+058F', s:[W('Armenian_alphabet'), UC('0530')]},
+
+ geo:{n:['Грузинское письмо','Georgian script'], d:['до 430 г.','before 430 CE'],
+   m:['Грузия','Georgia'],
+   x:[['Самый честный хедж на карте. «Их точное происхождение так и не было установлено; однако в строго структурном отношении их алфавитный порядок в значительной степени соответствует греческому».',
+       'The most honest hedge on this map. "Their exact origin has never been established; however, in strictly structural terms, their alphabetical order largely corresponds to the Greek alphabet."'],
+      ['Связь с греческим здесь показана по порядку букв и их именам — ан, бан, ган, — а не по форме знаков.',
+       'The link to Greek shown here rests on the order and the letter names — an, ban, gan — not on the shapes.']],
+   u:'U+10D0–U+10FF', s:[W('Georgian_scripts'), UC('10A0')]}
 };
 
-/* Общие описания поздних латинских этапов — по буквам отличается только начертание */
-function humCapD(L){
-  return ['Гуманисты XV века вернули римский монументальный капитал как прописную к своему минускулу. С этих рукописей венецианские печатники — Николя Йенсон, Франческо Гриффо, Альд Мануций — нарезали первые шрифты антиквы, и форма прописной '+L+' с тех пор почти не двигалась.'];
+/* ═══ три буквы ═══ */
+function L(sc, p, ch, cls, ln, note){
+  return {sc:sc, p:p, g:(ch === 'ox' ? 'ox' : (ch ? [ch, cls] : null)), ln:ln, note:note};
 }
-
-/* ——————————————————————————————————————————————————————
-   Данные
-   —————————————————————————————————————————————————————— */
-var DATA = [
-
-/* ============================ A ============================ */
-{
- letter:'A', rows:5,
- nodes:[
-  /* — row 1: ствол, маюскул — */
-  {id:'A0', col:0, row:1, g:U('A','f-mod',1.02), cap:'сегодня',
-   t:'Современная A', m:'Латиница · U+0041',
-   d:['Два наклонных штриха и поперечина. Эта форма пришла из римского монументального капитала I века до н. э. и за две тысячи лет изменилась разве что в пропорциях и засечках.'],
-   u:'U+0041 LATIN CAPITAL LETTER A', s:[SRC.wA, SRC.ulat]},
-
-  {id:'A1', col:1, row:1, g:U('A','f-mod',1.0), cap:'XV в.',
-   t:'Гуманистический капитал', m:'Италия · XV век',
-   d:humCapD('A'), s:[SRC.hum]},
-
-  {id:'A2', col:6, row:1, g:U('A','f-cap',.98), cap:'I в. до н. э.',
-   t:'Римский монументальный капитал', m:'Рим · I в. до н. э. — V в. н. э.',
-   d:['Capitalis monumentalis — парадное письмо надписей на камне, резанное долотом по разметке кистью. Отсюда происходят все современные прописные латиницы.',
-      'Линия к современной A идёт через девять веков без единого узла: в книжном письме менялись строчные, а капитал держали как есть и возвращали к нему всякий раз, когда хотели «правильно».'],
-   s:[SRC.sqcap, SRC.hist]},
-
-  {id:'A3', col:7, row:1, g:S('lat_A_old'), cap:'VII–VI вв. до н. э.',
-   t:'Старолатинская A', m:'Лаций · VII–VI вв. до н. э.',
-   d:['Латинский алфавит складывается в Италии в VII веке до н. э. Древнейшие формы видны на надписи Дуэноса (VI в. до н. э.): поперечина часто косая, штрихи неравной длины, направление письма ещё непостоянно.'],
-   s:[SRC.hist, SRC.duenos]},
-
-  {id:'A4', col:8, row:1, g:U('𐌀','f-ital',.92), cap:'VII в. до н. э.',
-   t:'Этрусская A', m:'Этрурия · VII в. до н. э. · U+10300',
-   d:['Этруски принесли греческий алфавит на Апеннинский полуостров и форму альфы оставили без изменений. Древнейший образец — абецедарий из Марсилианы, около 700 г. до н. э.'],
-   u:'U+10300 OLD ITALIC LETTER A', s:[SRC.ital, SRC.uital]},
-
-  {id:'A5', col:9, row:1, g:S('gk_a_west'), cap:'VIII в. до н. э.',
-   t:'Западногреческая альфа', m:'Эвбея и её колонии · VIII в. до н. э.',
-   d:['«Красный» (западный) тип греческого алфавита — тот, что бытовал в Эвбее, центральной Греции и почти во всех италийских колониях, прежде всего в Кумах и Питекусах. Именно он попал к этрускам и стал предком латиницы.',
-      'К этому времени альфа уже стоит на ногах: знак развернулся вместе с направлением письма.'],
-   s:[SRC.arch, SRC.ital]},
-
-  {id:'A6', col:10, row:1, g:S('gk_a_arch'), cap:'VIII в. до н. э.',
-   t:'Архаическая греческая альфа', m:'Греция · VIII в. до н. э.',
-   d:['В древнейших греческих надписях буква лежит на боку. Писали ещё справа налево, и знаки при этом зеркалились.',
-      'Здесь же происходит главное событие в истории письма: греки взяли финикийский знак гортанной смычки — согласный, которого в греческом не было, — и отдали его гласному /a/. Это первая буква для гласного звука.'],
-   s:[SRC.wA, SRC.alpha, SRC.arch]},
-
-  {id:'A7', col:11, row:1, g:U('𐤀','f-phn',.9), cap:'XII в. до н. э.',
-   t:'Финикийский ʾālep', m:'Финикия · XII в. до н. э. · U+10900',
-   d:['Согласный знак гортанной смычки [ʔ]. Имя буквы — «бык». Писали справа налево.',
-      'Финикийское письмо — консонантное: гласные не обозначались вовсе.'],
-   u:'U+10900 PHOENICIAN LETTER ALF', s:[SRC.aleph, SRC.uphn]},
-
-  {id:'A8', col:12, row:1, g:S('ps_alp'), cap:'XIX–XVI вв. до н. э.',
-   t:'Протосинайский ʾalp', m:'Синай, Серабит-эль-Хадим · XIX–XVI вв. до н. э.',
-   d:['Голова быка. По акрофоническому принципу знак читается как первый звук семитского *ʾalp — «бык».',
-      'Найдено в бирюзовых копях Серабит-эль-Хадим и в Вади-эль-Холь в Среднем Египте. Датировка спорна: ранняя — около 1850 г. до н. э., поздняя — около 1550 г. до н. э.',
-      'Начертания в разных надписях расходятся сильно; показанный контур — обобщённая прорисовка. В Юникоде протосинайского письма нет.'],
-   s:[SRC.psin, SRC.serab, SRC.l2]},
-
-  {id:'A9', col:13, row:1, g:U('𓃾','f-egy',.94), cap:'Древний Египет',
-   t:'Египетский иероглиф «голова быка»', m:'Египет · Gardiner F1 · U+130FE',
-   d:['Предполагаемый прообраз протосинайского ʾalp. Связь гипотетична: источники пишут «возможно восходит», и прямых доказательств нет.',
-      'Не путать с египетским «алефом»: знак, передававший звук ꜣ, — это гриф (Gardiner G1), другой иероглиф и другая история.'],
-   u:'U+130FE EGYPTIAN HIEROGLYPH F001', s:[SRC.gard, SRC.aleph, SRC.uegy]},
-
-  /* — row 0: греческая боковая ветвь — */
-  {id:'Ag', col:9, row:0, g:U('Α α','f-gk',.56), cap:'V–IV вв. до н. э.',
-   t:'Классическая греческая Α / α', m:'Иония, Афины · V–IV вв. до н. э.',
-   d:['«Синий» ионийский вариант, принятый в Афинах в 403 г. до н. э. и к середине IV века ставший общегреческим.',
-      'Это ветвь-родственник, а не предок латинской A: латиница пришла западным путём. Строчная α — продукт византийского минускула, на тысячу лет младше прописной.'],
-   u:'U+0391 · U+03B1', s:[SRC.alpha, SRC.ugrk]},
-
-  /* — row 2: книжное письмо, минускул — */
-  {id:'Ab0', col:0, row:2, g:U('a','f-mod',1.0), cap:'сегодня',
-   t:'Современная a', m:'Латиница · U+0061',
-   d:['Двухэтажная a — прямая наследница каролингского и гуманистического минускула.',
-      'Одноэтажная ɑ (U+0251) — та же буква в рукописном и курсивном изводе; в типографике её зовут «одноэтажной», в МФА это знак гласного заднего ряда.'],
-   u:'U+0061 · U+0251', s:[SRC.wA, SRC.ulat]},
-
-  {id:'Ab1', col:1, row:2, g:U('a','f-mod',1.0), cap:'нач. XV в.',
-   t:'Гуманистический минускул', m:'Флоренция · начало XV века',
-   d:['Поджо Браччолини в первом десятилетии XV века. Гуманисты приняли каролингские рукописи XI–XII веков за древнеримские и стали им подражать — отсюда и название «антиква».',
-      'С этого почерка сделаны строчные знаки первых печатных шрифтов.'],
-   s:[SRC.hum]},
-
-  {id:'Ab2', col:2, row:2, g:S('car_a'), cap:'IX в.',
-   t:'Каролингский минускул', m:'Ахен, Тур, Корби · конец VIII — IX век',
-   d:['Создан при Карле Великом; Алкуин Йоркский руководил придворным скрипторием в Ахене в 782–796 годах, затем перестроил скрипторий в Туре.',
-      'Округлые, ясно различимые знаки, пробелы между словами, прописные для заголовков. В раннюю пору ещё держалась унциальная a, похожая на сдвоенное cc.'],
-   s:[SRC.caro]},
-
-  {id:'Ab3', col:3, row:2, g:S('hunc_a'), cap:'III–VIII вв.',
-   t:'Полуунциал', m:'Рим, Африка, Ирландия, Англия · III–VIII вв.',
-   d:['«⟨a⟩ обычно круглая ⟨ɑ⟩, иногда со слегка открытым верхом» — это уже строчная в нашем понимании.',
-      'Название обманчиво: полуунциал не производное от унциала. Оба наследуют рустичному капиталу, по другой версии полуунциал идёт от позднеримского курсива. В Ирландию попал в V веке, оттуда в Англию в VII.'],
-   s:[SRC.hunc, SRC.unc, SRC.insul]},
-
-  {id:'Ab4', col:4, row:2, g:S('unc_A'), cap:'IV–VIII вв.',
-   t:'Унциал', m:'Латинский и греческий Запад · IV–VIII вв.',
-   d:['Маюскульное книжное письмо: широкие одномоментные штрихи круглых форм — пергамен позволял то, чего не позволял папирус.',
-      'В унциале левую ногу и поперечину A стали сводить в одну петлю. Отсюда и пошла строчная a. В африканском унциале чашка ⟨a⟩ особенно острая и заострённая.'],
-   s:[SRC.unc]},
-
-  {id:'Ab5', col:5, row:2, g:S('rust_A'), cap:'I–IX вв.',
-   t:'Рустичный капитал', m:'Рим · I–IX вв., чаще IV–VI',
-   d:['Capitalis rustica — тот же капитал, но писанный пером и кистью, а не резанный долотом: буквы уже и тоньше, больше кривых линий, выносные элементы уходят под строку.',
-      'Им писали роскошные списки языческих авторов; сохранилось около полусотни рукописей, из них четыре Вергилия.'],
-   s:[SRC.rust]},
-
-  /* — row 3: курсив — */
-  {id:'Ac0', col:6, row:3, g:S('orc_a'), cap:'I в. до н. э.',
-   t:'Староримский курсив', m:'Рим · I в. до н. э. — III в. н. э.',
-   d:['Бытовое письмо: счета, письма, граффити, школьные упражнения. Углы обычных букв здесь становятся кривыми — так быстрее вести инструментом.',
-      '«⟨a⟩ похожа на унциальную ⟨a⟩, но левый штрих ещё прямой». Читать трудно: ⟨b⟩ и ⟨d⟩ почти не различить, ⟨e⟩ в полную высоту, ⟨p⟩ и ⟨t⟩ похожи.'],
-   s:[SRC.curs]},
-
-  {id:'Ac1', col:5, row:3, g:S('nrc_a'), cap:'III–VII вв.',
-   t:'Новоримский курсив', m:'Рим · III–VII вв.',
-   d:['Четырёхлинейное письмо, его же зовут минускульным курсивом. «⟨a⟩, ⟨b⟩, ⟨d⟩ и ⟨e⟩ принимают более привычный вид», буквы становятся соразмерны друг другу.',
-      'Именно отсюда унциал и полуунциал взяли свои ⟨a⟩, ⟨g⟩, ⟨r⟩ и ⟨s⟩ — то есть наши строчные.'],
-   s:[SRC.curs]},
-
-  /* — row 4: готика, боковая ветвь — */
-  {id:'Ak', col:1, row:4, g:U('a','f-bl',1.0), cap:'XI–XV вв.',
-   t:'Готический минускул (блэклеттер)', m:'Северная Европа · XI–XV вв.',
-   d:['Каролингский минускул, сжатый и переломанный, — к X–XI векам он превращается в готику. Это вторая ветвь от каролингов, параллельная гуманистической.',
-      'Для современной антиквы она тупиковая: Гутенберг печатал готикой, но итальянские печатники пошли за гуманистами, и победили они. В Германии и Скандинавии готика держалась до XX века.'],
-   s:[SRC.black, SRC.hum]}
- ],
- edges:[
-  ['A9','A8'],['A8','A7'],['A7','A6'],['A6','A5'],['A5','A4'],['A4','A3'],['A3','A2'],['A2','A1'],['A1','A0'],
-  ['A6','Ag'],
-  ['A2','Ab5'],['Ab5','Ab4'],['Ab4','Ab3'],['Ab3','Ab2'],['Ab2','Ab1'],['Ab1','Ab0'],
-  ['A2','Ac0'],['Ac0','Ac1'],['Ac1','Ab4'],['Ac1','Ab3'],
-  ['Ab2','Ak']
- ]
-},
-
-/* ============================ B ============================ */
-{
- letter:'B', rows:5,
- nodes:[
-  {id:'B0', col:0, row:1, g:U('B','f-mod',1.0), cap:'сегодня',
-   t:'Современная B', m:'Латиница · U+0042',
-   d:['Стойка и две чашки. Около 1300 года верхний и нижний регистр окончательно расходятся по смыслу: B и b перестают быть одной буквой в двух почерках.'],
-   u:'U+0042 LATIN CAPITAL LETTER B', s:[SRC.wB, SRC.ulat]},
-
-  {id:'B1', col:1, row:1, g:U('B','f-mod',1.0), cap:'XV в.',
-   t:'Гуманистический капитал', m:'Италия · XV век', d:humCapD('B'), s:[SRC.hum]},
-
-  {id:'B2', col:6, row:1, g:U('B','f-cap',.98), cap:'I в. до н. э.',
-   t:'Римский монументальный капитал', m:'Рим · I в. до н. э. — V в. н. э.',
-   d:['Capitalis monumentalis. Верхняя чашка меньше нижней — пропорция, которую антиква держит до сих пор.'],
-   s:[SRC.sqcap, SRC.hist]},
-
-  {id:'B3', col:7, row:1, g:S('lat_B_old'), cap:'VII–VI вв. до н. э.',
-   t:'Старолатинская B', m:'Лаций · VII–VI вв. до н. э.',
-   d:['B входит в число 21 буквы старолатинского алфавита. Пришла либо прямо из кумского алфавита, либо через архаические этрусские формы — источники этот вопрос не закрывают.'],
-   s:[SRC.hist, SRC.wB]},
-
-  {id:'B4', col:8, row:1, g:U('𐌁','f-ital',.92), cap:'VII в. до н. э.',
-   t:'Этрусская B — буква, которой не писали', m:'Этрурия · VII в. до н. э. · U+10301',
-   d:['Знак в староиталийском письме есть и в Юникоде закодирован. Но в этрусском языке не было звонких смычных /b d g/ — противопоставлялись придыхательные и непридыхательные, — и буквы b, d, g этруски фактически не использовали, как и o.',
-      'То есть B проехала через этрусский алфавит как пассажир: её передали дальше латинянам, которым звонкое /b/ было нужно.'],
-   u:'U+10301 OLD ITALIC LETTER BE', s:[SRC.etr, SRC.ital, SRC.uital]},
-
-  {id:'B5', col:9, row:1, g:S('gk_b_west'), cap:'VIII в. до н. э.',
-   t:'Западногреческая бета', m:'Эвбея и её колонии · VIII в. до н. э.',
-   d:['«Красный» западный тип, пришедший в Италию через Кумы и Питекусы. Форма уже близка к привычной: стойка и две округлые чашки.',
-      'Источники не описывают эвбейскую бету отдельно — её форма известна по надписям, а не по описанию.'],
-   s:[SRC.arch, SRC.ital]},
-
-  {id:'B6', col:10, row:1, g:S('gk_b_arch'), cap:'VIII в. до н. э.',
-   t:'Архаическая греческая бета', m:'Греция · VIII — нач. IV в. до н. э.',
-   d:['У беты «самое большое число резко расходящихся местных форм» из всех греческих букв (Jeffery, 1961). Свои начертания были у Гортины, Феры (сразу два), Аргоса, Мелоса, Коринфа, Мегар и Византия, Киклад.',
-      'Показан обобщённый архаический вариант с угловатыми чашками. Отдельных описаний этих форм источники не дают — только прорисовки надписей.'],
-   s:[SRC.beta, SRC.arch]},
-
-  {id:'B7', col:11, row:1, g:U('𐤁','f-phn',.9), cap:'XII в. до н. э.',
-   t:'Финикийский bēt', m:'Финикия · XII в. до н. э. · U+10901',
-   d:['Согласный /b/. Имя буквы — «дом». От него пошли греческая бета, латинская B, кириллические Б и В, армянская бен.',
-      'Еврейская ב — не потомок, а параллельное развитие того же финикийского знака.'],
-   u:'U+10901 PHOENICIAN LETTER BET', s:[SRC.bet, SRC.uphn]},
-
-  {id:'B8', col:12, row:1, g:S('ps_bet'), cap:'XIX–XVI вв. до н. э.',
-   t:'Протосинайский bēt', m:'Синай · XIX–XVI вв. до н. э.',
-   d:['Дом: прямоугольник, частично открытый с одной стороны — план постройки с проёмом. Звук /b/ по первому согласному семитского *baytu, «дом». Значение приписал знаку Алан Гардинер в 1916 году.',
-      'Датировка спорна (ок. 1850 или ок. 1550 г. до н. э.). В Юникоде письма нет; контур — прорисовка.'],
-   s:[SRC.psin, SRC.l2]},
-
-  {id:'B9', col:13, row:1, g:U('𓉐','f-egy',.94), cap:'Древний Египет',
-   t:'Египетский иероглиф pr «дом»', m:'Египет · Gardiner O1 · U+13250',
-   d:['План обнесённой стеной постройки с открытым дверным проёмом. В ранних династиях — просто квадрат с проёмом.',
-      'Связь гипотетична и помечена источниками как «возможная». Осложняет дело то, что собственный египетский знак для согласного /b/ был другим — нога с голенью (Gardiner D58, U+130C0).'],
-   u:'U+13250 EGYPTIAN HIEROGLYPH O001', s:[SRC.pr, SRC.gard, SRC.uegy]},
-
-  {id:'Bg', col:9, row:0, g:U('Β β','f-gk',.56), cap:'V–IV вв. до н. э.',
-   t:'Классическая греческая Β / β', m:'Греция · V–IV вв. до н. э.',
-   d:['Стандартная форма — округлая или заострённая. В древнегреческом буква звучала как /b/; к византийскому времени перешла в /v/ — поэтому в греческом она «вита», а в кириллице от того же знака получились и Б, и В.',
-      'Ветвь-родственник латинской B, а не её предок.'],
-   u:'U+0392 · U+03B2', s:[SRC.beta, SRC.ugrk]},
-
-  {id:'Bb0', col:0, row:2, g:U('b','f-mod',1.0), cap:'сегодня',
-   t:'Современная b', m:'Латиница · U+0062',
-   d:['Стойка и одна чашка справа — форма, устоявшаяся ещё в полуунциале IV века и с тех пор не менявшаяся по существу.'],
-   u:'U+0062 LATIN SMALL LETTER B', s:[SRC.wB, SRC.ulat]},
-
-  {id:'Bb1', col:1, row:2, g:U('b','f-mod',1.0), cap:'нач. XV в.',
-   t:'Гуманистический минускул', m:'Флоренция · начало XV века',
-   d:['Поджо Браччолини, первое десятилетие XV века, по образцу каролингских рукописей. Через Йенсона, Гриффо и Мануция этот почерк стал строчными антиквы.'],
-   s:[SRC.hum]},
-
-  {id:'Bb2', col:2, row:2, g:S('car_b'), cap:'IX в.',
-   t:'Каролингский минускул', m:'Ахен, Тур, Корби · конец VIII — IX век',
-   d:['Письмо, собранное из меровингского, островного и полуунциального при Карле Великом. Главное его качество — читаемость: округлые, ясно различимые знаки и пробелы между словами.'],
-   s:[SRC.caro]},
-
-  {id:'Bb3', col:3, row:2, g:S('hunc_b'), cap:'III–VIII вв.',
-   t:'Полуунциал', m:'III–VIII вв.',
-   d:['«⟨b⟩ и ⟨d⟩ имеют вертикальные стойки, тождественные современным буквам». То есть современная строчная b — это буквально полуунциальная буква.',
-      'Унциальная ⟨B⟩ и полуунциальная ⟨b⟩, принесённые григорианской и ирландской миссиями, дали островное ⟨b⟩ Англии и Ирландии.'],
-   s:[SRC.hunc, SRC.wB, SRC.insul]},
-
-  {id:'Bb4', col:4, row:2, g:S('unc_B'), cap:'IV–VIII вв.',
-   t:'Унциал', m:'IV–VIII вв.',
-   d:['Круглое маюскульное книжное письмо. У беты-B здесь свои региональные изводы: в византийском «b-d унциале» формы ⟨b⟩ и ⟨d⟩ ближе к полуунциальным, а в «b-r унциале» ⟨b⟩ вдвое больше остальных букв.'],
-   s:[SRC.unc]},
-
-  {id:'Bb5', col:5, row:2, g:S('rust_B'), cap:'I–IX вв.',
-   t:'Рустичный капитал', m:'Рим · I–IX вв.',
-   d:['Узкий, сжатый, кривых линий больше, чем у квадратного капитала, выносные элементы уходят под строку. После V века остался шрифтом заголовков.'],
-   s:[SRC.rust]},
-
-  {id:'Bc0', col:6, row:3, g:S('orc_b'), cap:'I в. до н. э.',
-   t:'Староримский курсив', m:'Рим · I в. до н. э. — III в. н. э.',
-   d:['«⟨b⟩ в римском курсиве имеет полукруглый выступ с левой стороны» — возможно, ради удобства лигатур. Из-за этого ⟨b⟩ и ⟨d⟩ почти неразличимы.'],
-   s:[SRC.curs]},
-
-  {id:'Bc1', col:5, row:3, g:S('nrc_b'), cap:'III–VII вв.',
-   t:'Новоримский курсив', m:'Рим · III–VII вв.',
-   d:['⟨b⟩ названа среди букв, которые здесь впервые «принимают более привычный вид». Вертикальные штрихи с наклоном вправо стали круглее и длиннее, чем в староримском курсиве.'],
-   s:[SRC.curs]},
-
-  {id:'Bk', col:1, row:4, g:U('b','f-bl',1.0), cap:'XI–XV вв.',
-   t:'Готический минускул (блэклеттер)', m:'Северная Европа · XI–XV вв.',
-   d:['Каролингский минускул, сжатый и переломанный. Нормандское завоевание разнесло каролингские полуунциальные формы по Англии, и из них выросла готика.',
-      'Для современной антиквы ветвь тупиковая, но для немецкой и скандинавской типографики — магистральная вплоть до XX века.'],
-   s:[SRC.black, SRC.wB]}
- ],
- edges:[
-  ['B9','B8'],['B8','B7'],['B7','B6'],['B6','B5'],['B5','B4'],['B4','B3'],['B3','B2'],['B2','B1'],['B1','B0'],
-  ['B6','Bg'],
-  ['B2','Bb5'],['Bb5','Bb4'],['Bb4','Bb3'],['Bb3','Bb2'],['Bb2','Bb1'],['Bb1','Bb0'],
-  ['B2','Bc0'],['Bc0','Bc1'],['Bc1','Bb4'],['Bc1','Bb3'],
-  ['Bb2','Bk']
- ]
-},
-
-/* ============================ C ============================ */
-{
- letter:'C', rows:6,
- nodes:[
-  {id:'C0', col:0, row:1, g:U('C','f-mod',1.0), cap:'сегодня',
-   t:'Современная C', m:'Латиница · U+0043',
-   d:['Одна из самых перегруженных букв латиницы: исторически она передавала и /k/, и /g/, а сегодня в разных языках читается как /k/, /s/, /ts/, /tʃ/ и ещё десяток способов.'],
-   u:'U+0043 LATIN CAPITAL LETTER C', s:[SRC.wC, SRC.ulat]},
-
-  {id:'C1', col:1, row:1, g:U('C','f-mod',1.0), cap:'XV в.',
-   t:'Гуманистический капитал', m:'Италия · XV век', d:humCapD('C'), s:[SRC.hum]},
-
-  {id:'C2', col:6, row:1, g:U('C','f-cap',.98), cap:'I в. до н. э.',
-   t:'Римский монументальный капитал', m:'Рим · I в. до н. э. — V в. н. э.',
-   d:['Capitalis monumentalis. C — почти правильная окружность с срезанными концами; эту геометрию антиква наследует до сих пор.'],
-   s:[SRC.sqcap, SRC.hist]},
-
-  {id:'C3', col:7, row:1, g:S('lat_C_old'), cap:'VII–VI вв. до н. э.',
-   t:'Старолатинская C — и /k/, и /g/', m:'Лаций · VII–VI вв. до н. э.',
-   d:['«В древнейших латинских надписях буквы c k q использовались для передачи звуков /k/ и /ɡ/». Выбор знака определялся следующей гласной: «q» перед огублённой гласной, «k» перед «a», «c» во всех остальных случаях.',
-      'То есть одна буква C веками обслуживала два разных звука — и это кончилось тем, что в III веке до н. э. для /g/ пришлось делать отдельную букву.'],
-   s:[SRC.wC, SRC.hist]},
-
-  {id:'C4', col:8, row:1, g:U('𐌂','f-ital',.92), cap:'VII в. до н. э.',
-   t:'Этрусская C', m:'Этрурия · VII в. до н. э. · U+10302',
-   d:['В этрусском не было противопоставления по звонкости, поэтому греческую гамму Γ, звучавшую как /g/, этруски приспособили под /k/. Отсюда и пошла главная путаница латинского алфавита.',
-      'Причина указана в источнике без ссылки на конкретную работу; другая статья объясняет набор этрусских букв иначе — через нужду записать звуки, которых не было в греческом.'],
-   u:'U+10302 OLD ITALIC LETTER KE', s:[SRC.wC, SRC.etr, SRC.uital]},
-
-  {id:'C5', col:9, row:1, g:S('gk_g_west'), cap:'VIII в. до н. э.',
-   t:'Западногреческая гамма', m:'Эвбея и её колонии · VIII в. до н. э.',
-   d:['В западном («красном») типе гамма принимает вид заострённой C. С-образные формы Γ — заострённые или округлые — были обычны и в материковой Греции, и на западе.',
-      'Именно эта округлая гамма и стала латинской C.'],
-   s:[SRC.arch, SRC.gamma]},
-
-  {id:'C6', col:10, row:1, g:S('gk_g_arch'), cap:'VIII в. до н. э.',
-   t:'Архаическая греческая гамма', m:'Греция · VIII в. до н. э.',
-   d:['«В архаической Греции форма гаммы была ближе к классической лямбде (Λ), тогда как лямбда сохраняла финикийскую L-образную форму». То есть гамма и лямбда какое-то время выглядели «наоборот».',
-      'При переходе от письма справа налево к письму слева направо знак развернули.'],
-   s:[SRC.gamma, SRC.arch]},
-
-  {id:'C7', col:11, row:1, g:U('𐤂','f-phn',.9), cap:'XII в. до н. э.',
-   t:'Финикийский gīml', m:'Финикия · XII в. до н. э. · U+10902',
-   d:['Звонкий заднеязычный /g/. Числовое значение — 3. Потомки: еврейская ג, арамейская 𐡂, сирийская ܓ, арабская ج.',
-      'Что означает имя — спорно. «Верблюд» (gamal) — популярное толкование, но Пауэлл возражает, что из рисунка верблюда такой знак не выводится; Ганц предлагает «оружие» или «боевой топор».'],
-   u:'U+10902 PHOENICIAN LETTER GAML', s:[SRC.gimel, SRC.uphn]},
-
-  {id:'C8', col:12, row:1, g:S('ps_gaml'), cap:'XIX–XVI вв. до н. э.',
-   t:'Протосинайский gaml', m:'Синай · XIX–XVI вв. до н. э.',
-   d:['Метательная палка — изогнутая линия. Звук /g/ по первому согласному имени знака.',
-      'В Юникоде письма нет; контур — прорисовка. Датировка спорна.'],
-   s:[SRC.psin, SRC.l2]},
-
-  {id:'C9', col:13, row:1, g:U('𓌙','f-egy',.94), cap:'IV тыс. до н. э.',
-   t:'Египетский иероглиф «метательная палка»', m:'Египет · Gardiner T14 · U+13319',
-   d:['Знак восходит к додинастическому времени — середине-концу IV тысячелетия до н. э.',
-      'Связь с gaml — гипотеза, и источники расходятся даже в том, что изображено: посох-праща, метательная палка или дубина. Формулировки везде осторожные: «возможно», «скорее всего».'],
-   u:'U+13319 EGYPTIAN HIEROGLYPH T014', s:[SRC.throw, SRC.gimel, SRC.uegy]},
-
-  {id:'Cg', col:9, row:0, g:U('Γ γ','f-gk',.56), cap:'V–IV вв. до н. э.',
-   t:'Классическая греческая Γ / γ', m:'Греция · V–IV вв. до н. э.',
-   d:['В древнегреческом — /g/, в новогреческом — фрикативный /ɣ/.',
-      'Угловатая Γ осталась в восточногреческой ветви; латиница ушла от неё с округлой западной формой. Ветвь-родственник, а не предок.'],
-   u:'U+0393 · U+03B3', s:[SRC.gamma, SRC.ugrk]},
-
-  /* — минускул c — */
-  {id:'Cb0', col:0, row:2, g:U('c','f-mod',1.0), cap:'сегодня',
-   t:'Современная c', m:'Латиница · U+0063', d:['Та же дуга, что и в прописной, только ростом в строчную.'],
-   u:'U+0063 LATIN SMALL LETTER C', s:[SRC.wC, SRC.ulat]},
-
-  {id:'Cb1', col:1, row:2, g:U('c','f-mod',1.0), cap:'нач. XV в.',
-   t:'Гуманистический минускул', m:'Флоренция · начало XV века', d:['Поджо Браччолини по каролингскому образцу; отсюда строчные антиквы.'], s:[SRC.hum]},
-
-  {id:'Cb2', col:2, row:2, g:S('car_c'), cap:'IX в.',
-   t:'Каролингский минускул', m:'Ахен, Тур, Корби · конец VIII — IX век',
-   d:['Отдельного описания каролингской ⟨c⟩ источники не дают — только общее: «единообразное письмо округлых форм, ясно различимые знаки, дисциплинированное и прежде всего читаемое».'],
-   s:[SRC.caro]},
-
-  {id:'Cb3', col:3, row:2, g:S('hunc_c'), cap:'III–VIII вв.',
-   t:'Полуунциал', m:'III–VIII вв.',
-   d:['Описания полуунциальной ⟨c⟩ в источниках нет. Известно только, что в итальянском унциале у круглых букв — ⟨c⟩, ⟨e⟩, ⟨o⟩ — более плоский верх и заострённая чашка.',
-      'Контур показан по этому общему указанию; это схема, а не прорисовка конкретной рукописи.'],
-   s:[SRC.hunc, SRC.unc]},
-
-  {id:'Cb4', col:4, row:2, g:S('unc_C'), cap:'IV–VIII вв.',
-   t:'Унциал', m:'IV–VIII вв.',
-   d:['Широкая круглая дуга одним движением пера. Итальянский унциал даёт более плоский верх, африканский — более острую чашку.'],
-   s:[SRC.unc]},
-
-  {id:'Cb5', col:5, row:2, g:S('rust_C'), cap:'I–IX вв.',
-   t:'Рустичный капитал', m:'Рим · I–IX вв.', d:['Узкий и сжатый вариант капитала, писанный пером и кистью.'], s:[SRC.rust]},
-
-  {id:'Cc0', col:6, row:3, g:S('orc_c'), cap:'I в. до н. э.',
-   t:'Староримский курсив', m:'Рим · I в. до н. э. — III в. н. э.',
-   d:['Источники перечисляют трудные для чтения буквы староримского курсива — a, b, d, e, p, t, v, — но ⟨c⟩ среди них не разбирают.',
-      'Контур показан по общему правилу: «углы обычных букв в римском курсиве писались кривыми». Это схема, а не засвидетельствованное начертание.'],
-   s:[SRC.curs]},
-
-  {id:'Cc1', col:5, row:3, g:S('nrc_c'), cap:'III–VII вв.',
-   t:'Новоримский курсив', m:'Рим · III–VII вв.',
-   d:['⟨c⟩ отдельно не описана; источник называет привычными здесь ⟨a⟩, ⟨b⟩, ⟨d⟩ и ⟨e⟩ и отмечает, что все буквы стали соразмерны друг другу.'],
-   s:[SRC.curs]},
-
-  {id:'Ck', col:1, row:4, g:U('c','f-bl',1.0), cap:'XI–XV вв.',
-   t:'Готический минускул (блэклеттер)', m:'Северная Европа · XI–XV вв.',
-   d:['Сжатая и переломанная каролингская форма. Боковая ветвь: к современной антикве ведёт не она, а гуманистический минускул.'],
-   s:[SRC.black]},
-
-  /* — ветвь G — */
-  {id:'G0', col:6, row:5, g:S('lat_G'), cap:'ок. 230 до н. э.',
-   t:'Рождение G', m:'Рим · III в. до н. э.',
-   d:['К этому времени «K» вышла из употребления, а «C» стала передавать /k/ во всех позициях — и звонкий /g/ остался без буквы. Тогда к C добавили штрих.',
-      'Создателем называют Спурия Карвилия Ругу, вольноотпущенника, открывшего около 230 г. до н. э. первую в Риме платную школу. Источник — Плутарх; атрибуция оспаривалась (Корссен считал, что G была в ходу и раньше).',
-      'Новую букву поставили на седьмое место — туда, где раньше стояла Z, выброшенная цензором Аппием Клавдием. Поэтому G и сегодня седьмая.'],
-   s:[SRC.wG, SRC.ruga, SRC.hist]},
-
-  {id:'G1', col:3, row:5, g:S('unc_g'), cap:'IV–VIII вв.',
-   t:'Унциальная и полуунциальная ᵹ', m:'IV–VIII вв.',
-   d:['«⟨g⟩ имеет плоский верх, без чашки, и изогнутый выносной элемент ⟨ᵹ⟩ — отчасти похожа на цифру 5».',
-      'Эту форму и вытеснит каролингская g.'],
-   s:[SRC.hunc, SRC.unc]},
-
-  {id:'G2', col:2, row:5, g:S('car_g'), cap:'IX в.',
-   t:'Каролингская g', m:'IX век',
-   d:['«Буква g по существу та же, что современная строчная, а не прежняя унциальная ᵹ».',
-      'Это двухэтажная g с петлёй-хвостом: именно она исходная. Одноэтажная «открытохвостая» g появилась позже, в монастырском переписывании, и ею же печатал Гутенберг; гуманисты вернули петлю.'],
-   s:[SRC.caro, SRC.wG]},
-
-  {id:'G3', col:1, row:5, g:U('G g','f-mod',.56), cap:'XV в.',
-   t:'Гуманистические G и g', m:'Италия · XV век',
-   d:['Гуманистический минускул «вновь утвердил» форму с замкнутым хвостом. С неё и нарезаны строчные антиквы.'],
-   s:[SRC.hum, SRC.wG]},
-
-  {id:'G4', col:0, row:5, g:U('G g','f-mod',.56), cap:'сегодня',
-   t:'Современные G и g', m:'Латиница · U+0047 · U+0067',
-   d:['Двухэтажная («петлехвостая») g — в большинстве антиквенных шрифтов, например в Times; у неё есть «ушко» — маленький штрих справа вверху. Одноэтажная («открытохвостая») — в рукописном письме и в большинстве гротесков, например в Helvetica.',
-      'Для Юникода это одна буква: U+0067 покрывает оба начертания. Отдельный знак ɡ (U+0261) существует только для строгой записи МФА.'],
-   u:'U+0047 · U+0067 · U+0261', s:[SRC.wG, SRC.ulat]}
- ],
- edges:[
-  ['C9','C8'],['C8','C7'],['C7','C6'],['C6','C5'],['C5','C4'],['C4','C3'],['C3','C2'],['C2','C1'],['C1','C0'],
-  ['C6','Cg'],
-  ['C2','Cb5'],['Cb5','Cb4'],['Cb4','Cb3'],['Cb3','Cb2'],['Cb2','Cb1'],['Cb1','Cb0'],
-  ['C2','Cc0'],['Cc0','Cc1'],['Cc1','Cb4'],['Cc1','Cb3'],
-  ['Cb2','Ck'],
-  ['C3','G0'],['G0','G1'],['G1','G2'],['G2','G3'],['G3','G4']
- ]
-}
+var SPINE = [
+ ['cun',  null,   '𒀀','f-cun', ['а (знак A)','a (sign A)'], [
+   'Показан клинописный знак A. Соответствия букве тут нет и быть не может: клинопись слоговая, а связь с деревом — только та пунктирная линия вправо.',
+   'Shown is the cuneiform sign A. There is no letter correspondence here and cannot be: cuneiform is syllabic, and the only link to this tree is that dotted line to the right.']]
 ];
 
-/* ——————————————————————————————————————————————————————
-   Раскладка
-   —————————————————————————————————————————————————————— */
-var MAXCOL = 13;
-var chart    = document.getElementById('chart');
-var pop      = document.getElementById('pop');
-var scroller = document.getElementById('scroller');
-var gutter   = document.getElementById('gutter');
-var byId = {};
-var openId = null;
-var M = {};
-
-DATA.forEach(function(L){ L.nodes.forEach(function(n){ byId[n.id] = n; }); });
-
-function metrics(){
-  var w = document.documentElement.clientWidth;
-  if(w < 560) return {GL:32, colP:68, rowP:78, pad:48, gut:44, ini:30, cap:9};
-  if(w < 920) return {GL:38, colP:80, rowP:92, pad:56, gut:52, ini:38, cap:9.5};
-  return           {GL:50, colP:100, rowP:114, pad:78, gut:70, ini:54, cap:10};
+function tree(spec){
+  var out = [];
+  spec.forEach(function(r){ out.push(L(r[0], r[1], r[2], r[3], r[4], r[5])); });
+  return out;
 }
 
-function buildDOM(){
-  chart.innerHTML = ''; gutter.innerHTML = '';
-  DATA.forEach(function(L){
-    var tree = document.createElement('div');
-    tree.className = 'tree';
-    var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    svg.setAttribute('class','lines');
-    tree.appendChild(svg);
-    L._svg = svg;
+var ALEPH = tree([
+ ['cun',  null,  '𒀀','f-cun',['знак A','sign A'], SPINE[0][5]],
+ ['egy',  'cun', '𓃾','f-egy',['голова быка (F1)','ox head (F1)'], [
+   'Предполагаемый прообраз. Связь хеджирована: «возможно восходит». Не путать с египетским «алефом» — знаком грифа (G1), это другой иероглиф.',
+   'The presumed prototype, hedged in the sources as "may have been based on". Not to be confused with the Egyptian "aleph", the vulture sign (G1) — a different hieroglyph.']],
+ ['psin', 'egy', 'ox',null,   ['ʾalp — «бык»','ʾalp — "ox"'], [
+   'По акрофоническому принципу знак читается как первый звук семитского *ʾalp, «бык».',
+   'By acrophony the sign is read as the first sound of Semitic *ʾalp, "ox".']],
+ ['ugar', 'psin','𐎀','f-uga',['ʾalpa','ʾalpa'], null],
+ ['phn',  'psin','𐤀','f-phn',['ʾālep','ʾālep'], [
+   'Согласный знак гортанной смычки [ʔ]. Имя значит «бык».',
+   'A consonant sign for the glottal stop [ʔ]. The name means "ox".']],
+ ['osa',  'psin','𐩱','f-osa',['ʾalef','ʾalef'], null],
+ ['geez', 'osa', 'አ','f-eth', ['ʾalf','ʾalf'], null],
+ ['paleo','phn', '𐤀','f-phn',['ʾalef','ʾalef'], null],
+ ['sam',  'paleo','ࠀ','f-sam',['alaf','alaf'], null],
+ ['aram', 'phn', '𐡀','f-ara',['ʾaleph','ʾaleph'], null],
+ ['heb',  'aram','א','f-heb', ['ʾalef','ʾalef'], null],
+ ['nab',  'aram','𐢁','f-nab',['ʾaleph','ʾaleph'], null],
+ ['arab', 'nab', 'ا','f-arb', ['ʾalif','ʾalif'], [
+   'Первая буква и арабского, и старого абджадного порядка. Показана изолированная форма: в слове она меняется.',
+   'The first letter of both the modern order and the old abjadī order. Shown in isolated form: inside a word it changes.']],
+ ['palm', 'aram','𐡠','f-pal',['ʾaleph','ʾaleph'], null],
+ ['syr',  'palm','ܐ','f-syr', ['ʾālap','ʾālap'], null],
+ ['sogd', 'syr', '𐼰','f-sog',['ʾaleph','ʾaleph'], null],
+ ['uyg',  'sogd','𐽰','f-uyg',['ʾaleph','ʾaleph'], null],
+ ['mong', 'uyg', 'ᠠ','f-mon', ['a','a'], null],
+ ['mand', 'aram','ࡀ','f-man', ['halqa','halqa'], null],
+ ['grk',  'phn', 'Α','f-lat', ['альфа','alpha'], [
+   'Тот самый момент: согласный становится гласным /a/. Первая буква для гласного звука в истории письма.',
+   'The moment itself: a consonant becomes the vowel /a/. The first letter for a vowel sound in the history of writing.']],
+ ['etr',  'grk', '𐌀','f-ita',['a','a'], null],
+ ['lat',  'etr', 'A','f-lat', ['A a','A a'], null],
+ ['copt', 'grk', 'Ⲁ','f-cop', ['альфа','alfa'], null],
+ ['goth', 'grk', '𐌰','f-got',['ahsa','ahsa'], null],
+ ['glag', 'grk', 'Ⰰ','f-gla', ['азъ','azŭ'], null],
+ ['cyr',  'grk', 'А','f-lat', ['аз','az'], null],
+ ['arm',  'grk', 'Ա','f-arm', ['айб','ayb'], null],
+ ['geo',  'grk', 'ა','f-geo', ['ан','an'], null]
+]);
 
-    L.nodes.forEach(function(n){
-      var b = document.createElement('button');
-      b.className = 'node'; b.type = 'button';
-      b.setAttribute('aria-expanded','false');
-      b.setAttribute('aria-label', n.t);
-      b.dataset.id = n.id;
-      b.innerHTML = '<span class="gl' + (n.g.k === 'txt' ? ' ' + n.g.c : '') +
-                    '"></span><span class="cap">' + n.cap + '</span>';
-      var gl = b.firstChild;
-      gl.innerHTML = n.g.k === 'svg' ? svgGlyph(n.g.v) : n.g.v;
-      tree.appendChild(b);
-      n._el = b; n._gl = gl; n._cap = b.lastChild;
-    });
+var BETH = tree([
+ ['cun',  null,  '𒁀','f-cun',['знак BA','sign BA'], SPINE[0][5]],
+ ['egy',  'cun', '𓉐','f-egy',['дом, pr (O1)','house, pr (O1)'], [
+   'План обнесённой стеной постройки с открытым дверным проёмом. Связь хеджирована как «возможная»; вдобавок собственный египетский знак для /b/ был другим — нога с голенью (D58).',
+   'The floor plan of a walled building with an open doorway. The link is hedged as "possible"; and the Egyptian sign for /b/ itself was a different one — the foot and calf (D58).']],
+ ['psin', 'egy', 'ox',null,   ['bayt — «дом»','bayt — "house"'], [
+   'Прямоугольник, частично открытый с одной стороны. Звук /b/ по первому согласному семитского *baytu, «дом»; значение знаку приписал Алан Гардинер в 1916 году.',
+   'A rectangle partially open along one side. The sound /b/ from the first consonant of Semitic *baytu, "house"; the value was assigned by Alan Gardiner in 1916.']],
+ ['ugar', 'psin','𐎁','f-uga',['beta','beta'], null],
+ ['phn',  'psin','𐤁','f-phn',['bēt','bēt'], [
+   'От него пошли греческая бета, латинская B, кириллические Б и В, армянская бен. Еврейская ב — не потомок, а параллельное развитие того же знака.',
+   'From it came Greek beta, Latin B, Cyrillic Be and Ve, Armenian ben. Hebrew ב is not a descendant but a parallel development of the same sign.']],
+ ['osa',  'psin','𐩨','f-osa',['bēt','bēt'], null],
+ ['geez', 'osa', 'በ','f-eth', ['bet','bet'], null],
+ ['paleo','phn', '𐤁','f-phn',['bet','bet'], null],
+ ['sam',  'paleo','ࠁ','f-sam',['bit','bit'], null],
+ ['aram', 'phn', '𐡁','f-ara',['bēth','bēth'], null],
+ ['heb',  'aram','ב','f-heb', ['bet','bet'], null],
+ ['nab',  'aram','𐢃','f-nab',['bēth','bēth'], null],
+ ['arab', 'nab', 'ب','f-arb', ['bāʾ','bāʾ'], null],
+ ['palm', 'aram','𐡡','f-pal',['bēth','bēth'], null],
+ ['syr',  'palm','ܒ','f-syr', ['bēth','bēth'], null],
+ ['mand', 'aram','ࡁ','f-man', ['ab','ab'], null],
+ ['grk',  'phn', 'Β','f-lat', ['бета','beta'], [
+   'У беты «самое большое число резко расходящихся местных форм» из всех греческих букв (Jeffery, 1961): свои были у Гортины, Феры, Аргоса, Мелоса, Коринфа, Мегар и Византия.',
+   'Beta "had the largest number of highly divergent local forms" of all Greek letters (Jeffery 1961): Gortyn, Thera, Argos, Melos, Corinth, Megara and Byzantium each had their own.']],
+ ['etr',  'grk', '𐌁','f-ita',['be','be'], [
+   'Буква в алфавите есть, но этруски ею практически не писали: звонких смычных в языке не было. Она проехала через этрусский как пассажир — и досталась латинянам, которым /b/ был нужен.',
+   'The letter is in the alphabet, but the Etruscans barely wrote with it: their language had no voiced stops. It rode through Etruscan as a passenger and reached the Latins, who needed /b/.']],
+ ['lat',  'etr', 'B','f-lat', ['B b','B b'], null],
+ ['copt', 'grk', 'Ⲃ','f-cop', ['вида','vida'], null],
+ ['goth', 'grk', '𐌱','f-got',['bairkan','bairkan'], null],
+ ['glag', 'grk', 'Ⰱ','f-gla', ['буки','buky'], null],
+ ['cyr',  'grk', 'В','f-lat', ['веди','vedi'], [
+   'Наследник беты в кириллице — это В, а не Б: к византийскому времени греческая бета звучала уже как /v/. Буква Б была добавлена отдельно, чтобы записать звук /b/, которого в греческом к тому моменту не осталось.',
+   'The heir of beta in Cyrillic is В, not Б: by Byzantine times Greek beta was pronounced /v/. The letter Б was added separately to write the /b/ that Greek no longer had.']],
+ ['arm',  'grk', 'Բ','f-arm', ['бен','ben'], null],
+ ['geo',  'grk', 'ბ','f-geo', ['бан','ban'], null]
+]);
 
-    chart.appendChild(tree);
-    L._tree = tree;
+var GIMEL = tree([
+ ['cun',  null,  '𒂵','f-cun',['знак GA','sign GA'], SPINE[0][5]],
+ ['egy',  'cun', '𓌙','f-egy',['метательная палка (T14)','throwstick (T14)'], [
+   'Знак восходит к додинастическому времени. Источники расходятся даже в том, что изображено: посох-праща, метательная палка или дубина.',
+   'The sign dates from the Predynastic Period. The sources differ even on what is depicted: a staff sling, a throwing stick, or a club.']],
+ ['psin', 'egy', 'ox',null,   ['gaml','gaml'], [
+   'Изогнутая метательная палка. Имя оспаривается: «верблюд» — популярное толкование, но Пауэлл возражает, что из рисунка верблюда такой знак не выводится; Ганц предлагает «оружие» или «боевой топор».',
+   'A bent throwstick. The name is disputed: "camel" is the popular reading, but Powell objects that such a sign cannot be derived from a picture of a camel; Gandz proposes "weapon" or "battle-axe".']],
+ ['ugar', 'psin','𐎂','f-uga',['gamla','gamla'], null],
+ ['phn',  'psin','𐤂','f-phn',['gīml','gīml'], [
+   'Звонкий заднеязычный /g/. Числовое значение — 3.',
+   'The voiced velar /g/. Its numeric value is 3.']],
+ ['osa',  'psin','𐩴','f-osa',['gīml','gīml'], null],
+ ['geez', 'osa', 'ገ','f-eth', ['gäml','gäml'], null],
+ ['paleo','phn', '𐤂','f-phn',['gimel','gimel'], null],
+ ['sam',  'paleo','ࠂ','f-sam',['gaman','gaman'], null],
+ ['aram', 'phn', '𐡂','f-ara',['gāmal','gāmal'], null],
+ ['heb',  'aram','ג','f-heb', ['gimel','gimel'], null],
+ ['nab',  'aram','𐢄','f-nab',['gīmel','gīmel'], null],
+ ['arab', 'nab', 'ج','f-arb', ['jīm','jīm'], [
+   'В старом абджадном порядке джим стоит третьей, как и гимель. В нынешнем арабском порядке она сдвинулась на пятое место.',
+   'In the old abjadī order jīm stands third, just like gimel. In the modern Arabic order it has moved to fifth place.']],
+ ['palm', 'aram','𐡢','f-pal',['gāmal','gāmal'], null],
+ ['syr',  'palm','ܓ','f-syr', ['gāmal','gāmal'], null],
+ ['mand', 'aram','ࡂ','f-man', ['ag','ag'], null],
+ ['grk',  'phn', 'Γ','f-lat', ['гамма','gamma'], [
+   '«В архаической Греции форма гаммы была ближе к классической лямбде (Λ), тогда как лямбда сохраняла финикийскую L-образную форму» — какое-то время они выглядели наоборот.',
+   '"In Archaic Greece, the shape of gamma was closer to a classical lambda (Λ), while lambda retained the Phoenician L-shape" — for a while the two looked swapped.']],
+ ['etr',  'grk', '𐌂','f-ita',['ke','ke'], [
+   'В этрусском не было противопоставления по звонкости, поэтому греческую гамму со звуком /g/ приспособили под /k/. Отсюда вся дальнейшая путаница латинской C.',
+   'Etruscan had no voicing contrast, so Greek gamma with its /g/ was repurposed for /k/. All the later confusion around Latin C starts here.']],
+ ['lat',  'etr', 'C','f-lat', ['C c · G g','C c · G g'], [
+   'Одна буква C веками обслуживала и /k/, и /g/. Около 230 г. до н. э. к ней добавили штрих и получили G, поставив новую букву на седьмое место — туда, где раньше стояла выброшенная Z.',
+   'A single letter C served both /k/ and /g/ for centuries. Around 230 BCE a stroke was added to it to make G, and the new letter took seventh place — the slot of the discarded Z.']],
+ ['copt', 'grk', 'Ⲅ','f-cop', ['гамма','gamma'], null],
+ ['goth', 'grk', '𐌲','f-got',['giba','giba'], null],
+ ['glag', 'grk', 'Ⰳ','f-gla', ['глаголи','glagoli'], [
+   'В глаголице и кириллице этот знак стоит четвёртым, а не третьим: перед ним вклинилась добавленная буква буки/Б.',
+   'In Glagolitic and Cyrillic this sign stands fourth, not third: the added letter buky/Б was wedged in before it.']],
+ ['cyr',  'grk', 'Г','f-lat', ['глаголь','glagol'], null],
+ ['arm',  'grk', 'Գ','f-arm', ['гим','gim'], null],
+ ['geo',  'grk', 'გ','f-geo', ['ган','gan'], null]
+]);
 
-    var ini = document.createElement('div');
-    ini.className = 'initial';
-    ini.textContent = L.letter;
-    gutter.appendChild(ini);
-    L._ini = ini;
+var TREES = [{k:0, nodes:ALEPH}, {k:1, nodes:BETH}, {k:2, nodes:GIMEL}];
+
+/* ═══ раскладка ═══ */
+var COLP = 232, ROWH = 56, NODEW = 182, GAPY = 170;
+var all = [], lines = [], titles = [], worldW = 0, worldH = 96;
+
+TREES.forEach(function(T, ti){
+  var ns = T.nodes, byId = {}, kids = {};
+  ns.forEach(function(n){ n.id = ti + ':' + n.sc; byId[n.sc] = n; kids[n.sc] = []; });
+  ns.forEach(function(n){ if(n.p && byId[n.p]) kids[n.p].push(n); });
+  ns.forEach(function(n){
+    var c = 0, cur = n;
+    while(cur.p && byId[cur.p]){ cur = byId[cur.p]; c++; }
+    n.col = c;
   });
-}
+  var lane = 0;
+  (function walk(n){
+    var ch = kids[n.sc];
+    if(!ch.length){ n.row = lane++; return; }
+    ch.forEach(walk);
+    n.row = (ch[0].row + ch[ch.length - 1].row) / 2;
+  })(ns[0]);
 
-function layout(){
-  M = metrics();
-  var GL = M.GL, colP = M.colP, rowP = M.rowP, pad = M.pad;
-  var nodeW = colP - 6, nodeH = GL + 30;
+  var baseY = worldH;
+  ns.forEach(function(n){
+    n.x = n.col * COLP;
+    n.y = baseY + n.row * ROWH + ROWH / 2;
+    n.tree = T;
+    all.push(n);
+    worldW = Math.max(worldW, n.x + NODEW);
+  });
+  ns.forEach(function(n){
+    if(!n.p || !byId[n.p]) return;
+    var a = byId[n.p];
+    lines.push({sx:a.x + NODEW - 6, sy:a.y, ex:n.x - 10, ey:n.y, hedge:(n.sc === 'egy')});
+  });
+  var l = UI.letters[ti];
+  titles.push({x:0, y:baseY - 74, big: LANG === 'ru' ? l[0] : l[2], small: LANG === 'ru' ? l[1] : l[3]});
+  worldH = baseY + lane * ROWH + GAPY;
+});
 
-  gutter.style.width = M.gut + 'px';
+/* ═══ отрисовка ═══ */
+var world = document.getElementById('world');
+var stage = document.getElementById('stage');
+var pop = document.getElementById('pop');
+var openId = null, byKey = {};
 
-  /* верхний ряд (греческая ветвь) занимает меньше места — там всего один узел */
-  var h0 = Math.round(rowP * 0.62);
-  function rowY(r){ return r === 0 ? h0 / 2 : h0 + (r - 1) * rowP + rowP / 2; }
+document.getElementById('head').innerHTML =
+  '<h1>' + T(UI.title) + '</h1><p>' + T(UI.sub) + '</p>' +
+  '<p style="margin-top:7px">' + T(UI.hint) + '</p>' +
+  '<p style="margin-top:7px">' + T(UI.links) + '</p>';
 
-  DATA.forEach(function(L){
-    var tree = L._tree, svg = L._svg;
-    var W = pad + (MAXCOL + 1) * colP;
-    var H = h0 + (L.rows - 1) * rowP;
-    tree.style.width = W + 'px';
-    tree.style.height = H + 'px';
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    svg.setAttribute('width', W); svg.setAttribute('height', H);
+(function draw(){
+  var svgNS = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('class', 'lines');
+  svg.setAttribute('width', worldW + 40);
+  svg.setAttribute('height', worldH + 40);
+  var d = '', dh = '';
+  lines.forEach(function(e){
+    var mx = (e.sx + e.ex) / 2;
+    var seg = (Math.abs(e.sy - e.ey) < 1)
+      ? 'M' + e.sx + ' ' + e.sy + 'L' + e.ex + ' ' + e.ey
+      : 'M' + e.sx + ' ' + e.sy + 'C' + mx + ' ' + e.sy + ',' + mx + ' ' + e.ey + ',' + e.ex + ' ' + e.ey;
+    if(e.hedge) dh += seg; else d += seg;
+  });
+  svg.innerHTML = '<path d="' + d + '"/><path class="hedge" d="' + dh + '"/>';
+  world.appendChild(svg);
 
-    L.nodes.forEach(function(n){
-      n._cx = (MAXCOL - n.col) * colP + colP / 2;   /* древнее — левее */
-      n._cy = rowY(n.row);
-      var el = n._el;
-      el.style.left  = (n._cx - nodeW / 2) + 'px';
-      el.style.top   = (n._cy - nodeH / 2) + 'px';
-      el.style.width = nodeW + 'px';
-      n._gl.style.width  = GL + 'px';
-      n._gl.style.height = GL + 'px';
-      if(n.g.k === 'txt') n._gl.style.fontSize = Math.round(GL * (n.g.s || 1)) + 'px';
-      n._cap.style.fontSize = M.cap + 'px';
-    });
-
-    var gap = GL / 2 + 12, d = '';
-    L.edges.forEach(function(e){
-      var a = byId[e[0]], b = byId[e[1]];          /* a — старше, b — моложе */
-      if(!a || !b) return;
-      if(Math.abs(a._cx - b._cx) < 1){             /* одна колонка: короткая вертикаль */
-        var dir = b._cy > a._cy ? 1 : -1;
-        d += 'M' + a._cx + ' ' + (a._cy + dir * gap) + 'L' + b._cx + ' ' + (b._cy - dir * gap);
-        return;
-      }
-      var dirx = b._cx > a._cx ? 1 : -1;
-      var sx = a._cx + dirx * gap, sy = a._cy, ex = b._cx - dirx * gap, ey = b._cy;
-      if(Math.abs(sy - ey) < 1){
-        d += 'M' + sx + ' ' + sy + 'L' + ex + ' ' + ey;
-      }else{
-        var mx = (sx + ex) / 2;
-        d += 'M' + sx + ' ' + sy + 'C' + mx + ' ' + sy + ',' + mx + ' ' + ey + ',' + ex + ' ' + ey;
-      }
-    });
-    svg.innerHTML = '<path d="' + d + '"/>';
+  titles.forEach(function(t){
+    var el = document.createElement('div');
+    el.className = 'ttl';
+    el.style.left = t.x + 'px'; el.style.top = t.y + 'px';
+    el.innerHTML = t.big + '<i>' + t.small + '</i>';
+    world.appendChild(el);
   });
 
-  DATA.forEach(function(L){
-    L._ini.style.top      = (L._tree.offsetTop + rowY(1) - M.ini * 0.62) + 'px';
-    L._ini.style.fontSize = M.ini + 'px';
-    L._ini.style.height   = M.ini + 'px';
+  all.forEach(function(n){
+    var s = SC[n.sc];
+    var b = document.createElement('button');
+    b.className = 'node'; b.type = 'button';
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-label', T(s.n));
+    b.dataset.id = n.id;
+    b.style.left = n.x + 'px'; b.style.top = (n.y - ROWH / 2) + 'px';
+    b.style.width = NODEW + 'px'; b.style.height = ROWH + 'px';
+    var g = n.g === 'ox' ? '<span class="gl" style="width:34px;height:34px">' + svgOx() + '</span>'
+          : n.g ? '<span class="gl ' + n.g[1] + '" style="width:34px;height:34px;font-size:34px">' + n.g[0] + '</span>'
+                : '<span class="gl none" style="width:34px;height:34px"></span>';
+    b.innerHTML = g + '<span class="tx"><span class="nm">' + T(s.n) + '</span>' +
+                  '<span class="dt">' + T(n.ln) + ' · ' + T(s.d) + '</span></span>';
+    world.appendChild(b);
+    n._el = b;
+    byKey[n.id] = n;
   });
+})();
 
-  if(!layout._started){ layout._started = true; scroller.scrollLeft = scroller.scrollWidth; }
-  if(openId) placePop(byId[openId]);
-}
-
-/* ——————————————————————————————————————————————————————
-   Окошко — просто текст на фоне
-   —————————————————————————————————————————————————————— */
+/* ═══ карточка ═══ */
 function popHTML(n){
-  var h = '<div class="pg">' + (n.g.k === 'svg'
-      ? svgGlyph(n.g.v)
-      : '<span class="' + n.g.c + '" style="font-size:' + Math.round(74 * (n.g.s || 1)) +
-        'px;line-height:.9">' + n.g.v + '</span>') + '</div>';
-  h += '<p class="pt">' + n.t + '</p>';
-  h += '<p class="pm">' + n.m + '</p>';
-  n.d.forEach(function(x){ h += '<p class="pd">' + x + '</p>'; });
-  if(n.u) h += '<p class="pu">' + n.u + '</p>';
-  h += '<p class="ps">' + n.s.map(function(x){
-         return '<a href="' + x[1] + '" target="_blank" rel="noopener">' + x[0] + '</a>';
+  var s = SC[n.sc];
+  var h = '<div class="pg">';
+  if(n.g === 'ox') h += svgOx();
+  else if(n.g)     h += '<span class="' + n.g[1] + '" style="font-size:66px;line-height:1">' + n.g[0] + '</span>';
+  else             h += '<span style="font-size:14px;color:var(--ink-45);line-height:1.3">' + T(UI.noUni) + '</span>';
+  h += '</div>';
+  h += '<p class="pt">' + T(s.n) + '</p>';
+  h += '<p class="pl">' + T(n.ln) + '</p>';
+  h += '<p class="pm">' + T(s.m) + ' · ' + T(s.d) + '</p>';
+  if(n.note) h += '<p class="pd">' + T(n.note) + '</p>';
+  s.x.forEach(function(x){ h += '<p class="pd">' + T(x) + '</p>'; });
+  if(s.u) h += '<p class="pu">' + s.u + '</p>';
+  h += '<p class="ps">' + s.s.map(function(x){
+         var ext = /^https?:/.test(x[1]) ? ' target="_blank" rel="noopener"' : '';
+         return '<a href="' + x[1] + '"' + ext + '>' + T(x[0]) + '</a>';
        }).join('') + '</p>';
-  h += '<button class="pclose" type="button">закрыть</button>';
+  h += '<button class="pclose" type="button">' + T(UI.close) + '</button>';
   return h;
 }
-
 function placePop(n){
   if(!n || !pop.classList.contains('on')) return;
-  var r  = n._el.getBoundingClientRect();
+  var r = n._el.getBoundingClientRect();
   var vw = document.documentElement.clientWidth, vh = window.innerHeight;
   var pw = pop.offsetWidth, ph = pop.offsetHeight;
-
-  var left = r.right + 20;
-  if(left + pw > vw - 14) left = r.left - pw - 20;
-  if(left < 14) left = Math.max(14, Math.min(vw - pw - 14, r.left - 10));
-
-  var top = r.top - 12;
+  var left = r.right + 16;
+  if(left + pw > vw - 14) left = r.left - pw - 16;
+  if(left < 14) left = Math.max(14, Math.min(vw - pw - 14, r.left));
+  var top = r.top - 14;
   if(top + ph > vh - 14) top = vh - ph - 14;
   if(top < 12) top = 12;
-
   pop.style.left = Math.round(left) + 'px';
-  pop.style.top  = Math.round(top) + 'px';
+  pop.style.top = Math.round(top) + 'px';
 }
-
 function showPop(id){
-  var n = byId[id];
-  if(!n) return;
+  var n = byKey[id]; if(!n) return;
   openId = id;
   pop.innerHTML = popHTML(n);
   pop.classList.add('on');
   pop.querySelector('.pclose').addEventListener('click', hidePop);
-  DATA.forEach(function(L){ L._tree.classList.toggle('dim', L.nodes.indexOf(n) > -1); });
-  chart.querySelectorAll('.node').forEach(function(el){
+  world.classList.add('dim');
+  world.querySelectorAll('.node').forEach(function(el){
     el.setAttribute('aria-expanded', el.dataset.id === id ? 'true' : 'false');
   });
   placePop(n);
 }
-
 function hidePop(){
   openId = null;
-  pop.classList.remove('on');
-  pop.innerHTML = '';
-  DATA.forEach(function(L){ L._tree.classList.remove('dim'); });
-  chart.querySelectorAll('.node').forEach(function(el){ el.setAttribute('aria-expanded','false'); });
+  pop.classList.remove('on'); pop.innerHTML = '';
+  world.classList.remove('dim');
+  world.querySelectorAll('.node').forEach(function(el){ el.setAttribute('aria-expanded','false'); });
 }
 
-/* ——————————————————————————————————————————————————————
-   События
-   —————————————————————————————————————————————————————— */
-buildDOM();
-layout();
+/* ═══ свободный холст ═══ */
+var tx = 0, ty = 0, k = 1;
+function apply(){
+  world.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + k + ')';
+  if(openId) placePop(byKey[openId]);
+}
+function headroom(){ return document.documentElement.clientWidth < 700 ? 196 : 182; }
+function fit(){                                   /* клавиша 0 — весь обзор */
+  var vw = stage.clientWidth, vh = stage.clientHeight;
+  var padL = 30, padT = headroom(), padR = 34, padB = 34;
+  k = Math.min((vw - padL - padR) / (worldW + 40), (vh - padT - padB) / (worldH + 40));
+  k = Math.max(0.06, Math.min(1, k));
+  tx = padL; ty = padT;
+  apply();
+}
+function home(){                                  /* стартовый вид — читаемый */
+  var vw = stage.clientWidth;
+  k = vw < 700 ? 0.62 : 0.84;
+  tx = vw < 700 ? 14 : 40;
+  ty = headroom();
+  apply();
+}
+function zoomAt(cx, cy, nk){
+  nk = Math.max(0.08, Math.min(4, nk));
+  tx = cx - (cx - tx) * (nk / k);
+  ty = cy - (cy - ty) * (nk / k);
+  k = nk; apply();
+}
 
+stage.addEventListener('wheel', function(e){
+  e.preventDefault();
+  if(e.ctrlKey || e.metaKey){
+    zoomAt(e.clientX, e.clientY, k * Math.exp(-e.deltaY * 0.012));
+  }else{
+    tx -= e.deltaX; ty -= e.deltaY; apply();
+  }
+}, {passive:false});
+
+var drag = null;
+stage.addEventListener('pointerdown', function(e){
+  if(e.target.closest('.node') || e.target.closest('#pop')) return;
+  if(e.pointerType === 'touch' && e.isPrimary === false) return;
+  drag = {x:e.clientX, y:e.clientY, tx:tx, ty:ty, id:e.pointerId, moved:false};
+  stage.setPointerCapture(e.pointerId);
+  stage.classList.add('grabbing');
+});
+stage.addEventListener('pointermove', function(e){
+  if(!drag || e.pointerId !== drag.id) return;
+  tx = drag.tx + (e.clientX - drag.x);
+  ty = drag.ty + (e.clientY - drag.y);
+  if(Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) > 4) drag.moved = true;
+  apply();
+});
+function endDrag(e){
+  if(!drag || (e && e.pointerId !== drag.id)) return;
+  if(!drag.moved) hidePop();
+  drag = null;
+  stage.classList.remove('grabbing');
+}
+stage.addEventListener('pointerup', endDrag);
+stage.addEventListener('pointercancel', endDrag);
+
+/* щипок на экране */
+var pts = {}, pinch = null;
+stage.addEventListener('pointerdown', function(e){ if(e.pointerType === 'touch') pts[e.pointerId] = e; });
+stage.addEventListener('pointermove', function(e){
+  if(e.pointerType !== 'touch') return;
+  if(!(e.pointerId in pts)) return;
+  pts[e.pointerId] = e;
+  var ids = Object.keys(pts);
+  if(ids.length !== 2){ pinch = null; return; }
+  var a = pts[ids[0]], b = pts[ids[1]];
+  var dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+  var cx = (a.clientX + b.clientX) / 2, cy = (a.clientY + b.clientY) / 2;
+  if(!pinch){ pinch = {d:dist, k:k}; return; }
+  drag = null;
+  zoomAt(cx, cy, pinch.k * (dist / pinch.d));
+});
+function dropPt(e){ delete pts[e.pointerId]; if(Object.keys(pts).length < 2) pinch = null; }
+stage.addEventListener('pointerup', dropPt);
+stage.addEventListener('pointercancel', dropPt);
+
+/* ═══ события узлов ═══ */
 var hoverCapable = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
 if(!hoverCapable) document.body.classList.add('touch');
 var hideTimer = null;
 
-chart.addEventListener('pointerover', function(e){
+world.addEventListener('pointerover', function(e){
   if(!hoverCapable) return;
-  var b = e.target.closest('.node');
-  if(!b) return;
-  clearTimeout(hideTimer);
-  showPop(b.dataset.id);
+  var b = e.target.closest('.node'); if(!b) return;
+  clearTimeout(hideTimer); showPop(b.dataset.id);
 });
-chart.addEventListener('pointerout', function(e){
+world.addEventListener('pointerout', function(e){
   if(!hoverCapable) return;
   if(!e.target.closest('.node')) return;
   if(e.relatedTarget && (pop.contains(e.relatedTarget) || e.relatedTarget.closest('.node'))) return;
-  hideTimer = setTimeout(hidePop, 200);
+  hideTimer = setTimeout(hidePop, 220);
 });
 pop.addEventListener('pointerenter', function(){ clearTimeout(hideTimer); });
-pop.addEventListener('pointerleave', function(){ if(hoverCapable) hideTimer = setTimeout(hidePop, 200); });
-
-chart.addEventListener('click', function(e){
-  var b = e.target.closest('.node');
-  if(!b) return;
-  e.preventDefault();
+pop.addEventListener('pointerleave', function(){ if(hoverCapable) hideTimer = setTimeout(hidePop, 220); });
+world.addEventListener('click', function(e){
+  var b = e.target.closest('.node'); if(!b) return;
+  e.preventDefault(); e.stopPropagation();
   if(openId === b.dataset.id && !hoverCapable) hidePop(); else showPop(b.dataset.id);
 });
-chart.addEventListener('focusin', function(e){
-  var b = e.target.closest('.node');
-  if(b) showPop(b.dataset.id);
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') hidePop();
+  if(e.key === '0'){ fit(); }
 });
+window.addEventListener('resize', function(){ hidePop(); apply(); });
 
-document.addEventListener('keydown', function(e){ if(e.key === 'Escape') hidePop(); });
-document.addEventListener('click', function(e){
-  if(e.target.closest('.node') || e.target.closest('#pop')) return;
-  hidePop();
-});
-
-scroller.addEventListener('scroll', function(){
-  if(openId) placePop(byId[openId]);
-}, {passive:true});
-
-var rt = null;
-window.addEventListener('resize', function(){
-  clearTimeout(rt);
-  rt = setTimeout(function(){ hidePop(); layout(); }, 120);
-});
-window.addEventListener('scroll', function(){ if(openId) placePop(byId[openId]); }, {passive:true});
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+home();
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ /* шрифты не меняют раскладку */ });
 })();
 </script>
 </body>
