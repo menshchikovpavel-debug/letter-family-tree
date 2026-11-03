@@ -276,11 +276,23 @@ var SC = {
        'From here the chain forks: the capital barely changed, while the lowercase took the long road through cursive and book hands.']],
    u:'', s:[W('Roman_square_capitals')]},
 
- latMaj:{n:['Современная прописная','Modern capital'], d:['сегодня','today'],
-   m:['Латиница','Latin alphabet'],
-   x:[['Девятнадцать веков без единого заметного шага. Гуманисты XV века просто вернули римский капитал как прописную к своему минускулу, и с него печатники нарезали первые шрифты антиквы.',
-       'Nineteen centuries without a single visible step. The 15th-century humanists simply brought back the Roman capital as the uppercase for their minuscule, and the printers cut the first roman types from it.']],
-   u:'U+0041 · U+0042 · U+0043', s:[W('Roman_square_capitals'), W('Humanist_minuscule')]},
+ latMaj:{n:['Капитал доживает без изменений','The capital survives unchanged'], d:['I в. до н. э. — сегодня','1st c. BCE – today'],
+   m:['Рим, затем вся Европа','Rome, then all of Europe'],
+   x:[['Девятнадцать веков без единого заметного шага. Пока строчная ходила кругами через скоропись и книжные почерки, капитал просто лежал и ждал.',
+       'Nineteen centuries without a single visible step. While the lowercase went the long way round through cursive and book hands, the capital simply sat and waited.'],
+      ['Гуманисты XV века вернули римский капитал как прописную к своему минускулу, и с него печатники нарезали первые шрифты антиквы. Это не новая буква, а та же самая.',
+       'The 15th-century humanists brought the Roman capital back as the uppercase for their minuscule, and the printers cut the first roman types from it. Not a new letter — the same one.']],
+   u:'', s:[W('Roman_square_capitals'), W('Humanist_minuscule')]},
+
+ latBi:{n:['Два регистра в одном тексте','Two cases in one text'], d:['с IX в., закреплено печатью','from the 9th c., fixed by printing'],
+   m:['Европа','Europe'],
+   x:[['Вот где ветки сходятся обратно. До этого момента прописных букв не существовало — не потому что их не придумали, а потому что не с чем было противопоставлять: алфавит был ОДИН. Финикийским, греческим, этрусским, старолатинским, римским капиталом, унциалом — каждым из них писали весь текст целиком.',
+       'This is where the branches meet again. Until this point capitals did not exist — not because nobody had invented them, but because there was nothing to contrast them with: there was ONE alphabet. Phoenician, Greek, Etruscan, Old Latin, Roman capitals, uncial — each wrote whole texts on its own.'],
+      ['«Хотя маюскульные письменности изначально использовались для записи целых текстов, их буквы со временем стали употребляться преимущественно в современной функции прописных букв в европейском письме». Смешение двух наборов в одном тексте впервые описано как каролингское соглашение: «употребление верхнего регистра для заголовков, смесь верхнего и нижнего для подзаголовков и нижний регистр для основного текста».',
+       '"While majuscule scripts were originally used to write entire texts, their letters eventually came to be used primarily with the modern function of uppercase letters in European writing." Mixing the two sets in one text is first described as a Carolingian convention: "the usage of upper-case for titles, a mix of upper and lower case for subtitles, and lower case for the body of a text."'],
+      ['Твёрдой даты, когда латиница стала двухрегистровой окончательно, источники не дают. Сами слова «верхний» и «нижний регистр» — вообще из типографии: «заглавные буквы хранились в отдельном неглубоком лотке, или „кассе“, которая располагалась над кассой со строчными».',
+       'The sources give no firm date for when Latin became fully bicameral. The very words "upper case" and "lower case" come from the print shop: "the capital letters were stored in a separate shallow tray or ‘case’ that was located above the case that held the small letters."']],
+   u:'U+0041 · U+0061', s:[W('Letter_case'), W('Carolingian_minuscule')]},
 
  latRust:{n:['Рустичный капитал','Rustic capitals'], d:['I–IX вв.','1st–9th c. CE'],
    m:['Рим','Rome'],
@@ -635,10 +647,14 @@ var SCL = {
       '"In the earliest Latin inscriptions, the letters c k q were used to represent the sounds /k/ and /ɡ/": q before a rounded vowel, k before a, c elsewhere.']}),
 
  latCap: S('latOld','A','B','C','f-cap', ['A','B','C'], {
+   0:['Это ещё не «прописная»: строчных не существует, противопоставлять не с чем. Capitalis monumentalis — просто единственный алфавит своего времени, которым пишут всё целиком.',
+      'This is not yet a "capital": there is no lowercase, nothing to contrast it with. Capitalis monumentalis is simply the one alphabet of its day, used to write everything.'],
    2:['Около 230 г. до н. э. к C добавили штрих и получили G, поставив новую букву на седьмое место — туда, где раньше стояла выброшенная цензором Аппием Клавдием Z.',
       'Around 230 BCE a stroke was added to C to make G, and the new letter took seventh place — the slot of the Z discarded by the censor Appius Claudius.']}),
 
  latMaj: S('latCap','A','B','C','f-lat', ['A','B','C'], {}),
+ latBi:  {p:'lat', g:[['A a','f-lat',.5],['B b','f-lat',.5],['C c','f-lat',.5]],
+          ln:['A a','B b','C c'], nt:{}},
  latRust:S('latCap','rust_A','rust_B','rust_C', null, ['A','B','C'], {}),
  latOrc: S('latCap','orc_a','orc_b','orc_c', null, ['a','b','c'], {
    1:['«⟨b⟩ в римском курсиве имеет полукруглый выступ с левой стороны» — из-за этого ⟨b⟩ и ⟨d⟩ почти неразличимы.',
@@ -647,6 +663,8 @@ var SCL = {
       'The sources list the hard-to-read letters of old Roman cursive but do not discuss c. The outline follows the general rule that "angles were written as curves": a schematic, not an attested form.']}),
  latNrc: S('latOrc','nrc_a','nrc_b','nrc_c', null, ['a','b','c'], {}),
  latUnc: S('latRust','unc_A','unc_B','unc_C', null, ['A','B','C'], {
+   1:['Унциал — «маюскульное письмо, написанное целиком заглавными буквами». Книгу писали унциалом от первой страницы до последней: это самостоятельное письмо, а не «верхний регистр».',
+      'Uncial is "a majuscule script (written entirely in capital letters)". A book was written in uncial from first page to last: a script in its own right, not an "upper case".'],
    0:['«В греческом почерке было принято сводить левую ногу и горизонтальный штрих в одну петлю» — отсюда и пошла наша строчная a.',
       '"In Greek handwriting, it was common to join the left leg and horizontal stroke into a single loop" — and that is where our lowercase a comes from.']}),
  latHunc:S('latUnc','hunc_a','hunc_b','hunc_c', null, ['a','b','c'], {}),
@@ -681,7 +699,7 @@ var SCL = {
 };
 
 /* живые алфавиты — в фильтр; вымершие — отдельной строкой */
-var ALSO = {lat:['latMaj','latBlack']};
+var ALSO = {lat:['latMaj','latBlack','latBi']};
 var LIVING  = ['lat','grk','cyr','heb','arab','syr','geez','arm','geo','copt','mong','sam','mand'];
 var EXTINCT = ['ugar','goth','glag','cun'];
 var SELECTED = {lat:true};
@@ -773,6 +791,14 @@ function render(){
       : 'M' + sx + ' ' + sy + 'C' + mx + ' ' + sy + ',' + mx + ' ' + ey + ',' + ex + ' ' + ey;
     if(n.sc === 'egy') dh += seg; else d += seg;
   });
+  /* слияние регистров: капитал второй линией втекает в двухрегистровый алфавит */
+  for(var li = 0; li < 3; li++){
+    var a2 = POS[li + ':latMaj'], b2 = POS[li + ':latBi'];
+    if(!a2 || !b2) continue;
+    var sx2 = a2.x + NODEW - 6, sy2 = a2.y, ex2 = b2.x - 10, ey2 = b2.y;
+    var mx2 = (sx2 + ex2) / 2;
+    d += 'M' + sx2 + ' ' + sy2 + 'C' + mx2 + ' ' + sy2 + ',' + mx2 + ' ' + ey2 + ',' + ex2 + ' ' + ey2;
+  }
   svg.innerHTML = '<path d="' + d + '"/><path class="hedge" d="' + dh + '"/>';
   world.appendChild(svg);
 
@@ -811,7 +837,7 @@ function half(str){
 function glyphHTML(g, px){
   if(!g) return '<span class="gl none" style="width:' + px + 'px;height:' + px + 'px"></span>';
   if(typeof g === 'string') return '<span class="gl" style="width:' + px + 'px;height:' + px + 'px">' + svgSign(g) + '</span>';
-  return '<span class="gl ' + g[1] + '" style="width:' + px + 'px;height:' + px + 'px;font-size:' + px + 'px">' + g[0] + '</span>';
+  return '<span class="gl ' + g[1] + '" style="width:' + px + 'px;height:' + px + 'px;font-size:' + Math.round(px * (g[2] || 1)) + 'px">' + g[0] + '</span>';
 }
 
 /* ═══ шапка и фильтр ═══ */
