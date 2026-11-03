@@ -52,18 +52,25 @@
     text-transform:uppercase;margin-top:12px;color:var(--ink-28)}
 
   .node{
-    position:absolute;display:flex;align-items:center;gap:11px;
+    position:absolute;display:flex;flex-direction:column;align-items:flex-start;
     background:none;border:0;padding:0;margin:0;cursor:pointer;
     color:var(--ink);font-family:inherit;text-align:left;
   }
   .node:focus{outline:none}
-  .node .gl{flex:0 0 auto;display:flex;align-items:center;justify-content:center;line-height:1}
-  .node .gl.none::after{content:"";display:block;width:62%;height:1px;background:var(--rule)}
-  .node .gl svg{display:block;width:100%;height:100%}
-  .node .gl svg path{fill:none;stroke:currentColor;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
-  .node .tx{min-width:0;flex:1 1 auto}
-  .node .nm{display:block;line-height:1.14;font-size:15px}
-  .node .dt{display:block;color:var(--ink-45);line-height:1.2;margin-top:2px;font-size:11px}
+  .node .row{display:flex;align-items:center;gap:13px;height:34px;margin-bottom:8px}
+  .gl{flex:0 0 auto;display:flex;align-items:center;justify-content:center;line-height:1}
+  .gl.none::after{content:"";display:block;width:62%;height:1px;background:var(--rule)}
+  .gl svg{display:block;width:100%;height:100%}
+  .gl svg path{fill:none;stroke:currentColor;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+  .node .nm{display:block;line-height:1.14;font-size:14px}
+  .node .dt{display:block;color:var(--ink-45);line-height:1.3;font-size:10.5px}
+
+  .key{position:absolute;display:flex;pointer-events:none}
+  .key span{
+    display:block;text-align:center;font-size:9px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-28);line-height:1.3;
+  }
+  .key i{display:block;font-style:normal;text-transform:none;letter-spacing:.04em;font-size:9px}
   .node:hover .nm,.node[aria-expanded="true"] .nm{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
   #world.dim .node:not([aria-expanded="true"]){opacity:.4}
 
@@ -83,9 +90,11 @@
     scrollbar-width:thin;scrollbar-color:var(--ink-28) transparent;
   }
   #pop.on{display:block}
-  #pop .pg{height:74px;margin-bottom:12px;display:flex;align-items:flex-end;line-height:1}
-  #pop .pg svg{display:block;height:100%;width:74px}
-  #pop .pg svg path{fill:none;stroke:currentColor;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+  #pop .trio{display:flex;gap:20px;margin-bottom:15px;align-items:flex-end}
+  #pop .trio .one{display:flex;flex-direction:column;align-items:center;gap:7px}
+  #pop .trio .one i{font-style:normal;font-size:11.5px;color:var(--ink-45);letter-spacing:.03em;white-space:nowrap}
+  #pop .pn{color:var(--ink);}
+  #pop .pn b{font-weight:500}
   #pop .pt{font-size:21px;line-height:1.2;margin:0 0 2px}
   #pop .pl{font-size:16px;line-height:1.2;margin:0 0 7px;color:var(--ink-70);font-style:italic}
   #pop .pm{font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-45);margin:0 0 11px}
@@ -151,8 +160,8 @@ function T(pair){ return !pair ? '' : (LANG === 'ru' ? pair[0] : pair[1]); }
 
 var UI = {
   title:['Карта букв','Letter Map'],
-  sub:['Три первые буквы алфавита — ʾалеф, бет, гимель — и всё, во что они превратились. Слева древнее, справа сегодняшнее.',
-       'The first three letters of the alphabet — ʾaleph, beth, gimel — and everything they turned into. Oldest on the left, today on the right.'],
+  sub:['Одно дерево письменностей. В каждом узле три знака: ʾалеф, бет, гимель — три первые буквы алфавита в этой письменности. Слева древнее, справа сегодняшнее.',
+       'One tree of scripts. Every node carries three signs: ʾaleph, beth, gimel — the first three letters of the alphabet in that script. Oldest on the left, today on the right.'],
   hint:['Тяните карту, щипок — масштаб. Наведите на узел. Клавиша 0 — вернуть обзор.',
         'Drag to pan, pinch to zoom. Hover a node. Press 0 to fit.'],
   links:['<a href="latin.html">Латиница по этапам</a> · <a href="scripts.html">Дерево письменностей</a>',
@@ -163,9 +172,17 @@ var UI = {
   letters:[['ʾАЛЕФ','БЫК','ʾALEPH','OX'],['БЕТ','ДОМ','BETH','HOUSE'],['ГИМЕЛЬ','МЕТАТЕЛЬНАЯ ПАЛКА','GIMEL','THROWSTICK']]
 };
 
-var OX = ["M34 46 L66 46","M34 46 L50 84 L66 46","M34 46 C22 40 14 26 18 13","M66 46 C78 40 86 26 82 13"];
-function svgOx(){ return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
-  OX.map(function(p){ return '<path d="'+p+'"/>'; }).join('') + '</svg>'; }
+var DRAWN = {
+  ox:   ["M34 46 L66 46","M34 46 L50 84 L66 46",
+         "M34 46 C22 40 14 26 18 13","M66 46 C78 40 86 26 82 13"],
+  house:["M76 24 L24 24 L24 80 L76 80 L76 62","M76 24 L76 42"],
+  stick:["M22 78 L50 28 C56 18 70 16 80 22"]
+};
+function svgSign(key){
+  var d = DRAWN[key] || DRAWN.ox;
+  return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
+    d.map(function(x){ return '<path d="'+x+'"/>'; }).join('') + '</svg>';
+}
 
 var W = function(slug, ru, en){ return [[ru||('Wikipedia: '+slug.replace(/_/g,' ')), en||('Wikipedia: '+slug.replace(/_/g,' '))],
        'https://en.wikipedia.org/wiki/'+slug]; };
@@ -366,202 +383,172 @@ var SC = {
    u:'U+10D0–U+10FF', s:[W('Georgian_scripts'), UC('10A0')]}
 };
 
-/* ═══ три буквы ═══ */
-function L(sc, p, ch, cls, ln, note){
-  return {sc:sc, p:p, g:(ch === 'ox' ? 'ox' : (ch ? [ch, cls] : null)), ln:ln, note:note};
+/* ═══ одно дерево. В каждом узле — три буквы сразу ═══ */
+function N(sc, p, a, b, c, cls, names, notes){
+  function G(ch){ return !ch ? null : (DRAWN[ch] ? ch : [ch, cls]); }
+  return {sc:sc, p:p, g:[G(a), G(b), G(c)], ln:names, nt:notes || {}};
 }
-var SPINE = [
- ['cun',  null,   '𒀀','f-cun', ['а (знак A)','a (sign A)'], [
-   'Показан клинописный знак A. Соответствия букве тут нет и быть не может: клинопись слоговая, а связь с деревом — только та пунктирная линия вправо.',
-   'Shown is the cuneiform sign A. There is no letter correspondence here and cannot be: cuneiform is syllabic, and the only link to this tree is that dotted line to the right.']]
+
+var TREE = [
+ N('cun',  null,  '𒀀','𒁀','𒂵','f-cun', ['знак A / sign A','знак BA / sign BA','знак GA / sign GA'], {0:[
+   'Клинопись слоговая: соответствия буквам тут нет и быть не может. Показаны знаки a, ba, ga — просто чтобы было видно, как выглядело письмо, от которого алфавит НЕ произошёл.',
+   'Cuneiform is syllabic: there is no letter correspondence here and cannot be. The signs a, ba, ga are shown only so you can see the writing the alphabet did NOT come from.']}),
+
+ N('egy',  'cun', '𓃾','𓉐','𓌙','f-egy', ['голова быка, F1 / ox head, F1','дом, pr, O1 / house, pr, O1','метательная палка, T14 / throwstick, T14'], {
+   0:['Предполагаемый прообраз ʾалефа. Связь хеджирована: «возможно восходит». Не путать с египетским «алефом» — знаком грифа (G1), это другой иероглиф.',
+      'The presumed prototype of ʾaleph, hedged in the sources as "may have been based on". Not to be confused with the Egyptian "aleph", the vulture sign (G1) — a different hieroglyph.'],
+   1:['План обнесённой стеной постройки с дверным проёмом. Осложняет дело то, что собственный египетский знак для звука /b/ был другим — нога с голенью (D58).',
+      'The floor plan of a walled building with a doorway. Awkwardly, the Egyptian sign for /b/ itself was a different one — the foot and calf (D58).'],
+   2:['Знак восходит к додинастическому времени. Источники расходятся даже в том, что изображено: посох-праща, метательная палка или дубина.',
+      'The sign dates from the Predynastic Period. The sources differ even on what is depicted: a staff sling, a throwing stick, or a club.']}),
+
+ N('psin', 'egy', 'ox','house','stick', null, ['ʾalp — «бык» / ʾalp — "ox"','bayt — «дом» / bayt — "house"','gaml — «метательная палка» / gaml — "throwstick"'], {
+   0:['По акрофоническому принципу знак читается как первый звук семитского *ʾalp, «бык». Вот он, трюк, из которого вырос алфавит.',
+      'By acrophony the sign is read as the first sound of Semitic *ʾalp, "ox". This is the trick the whole alphabet grew out of.'],
+   1:['Прямоугольник, частично открытый с одной стороны. Значение /b/ приписал знаку Алан Гардинер в 1916 году.',
+      'A rectangle partially open along one side. The value /b/ was assigned to it by Alan Gardiner in 1916.'],
+   2:['Имя оспаривается: «верблюд» — популярное толкование, но Пауэлл возражает, что из рисунка верблюда такой знак не выводится; Ганц предлагает «оружие» или «боевой топор».',
+      'The name is disputed: "camel" is the popular reading, but Powell objects that such a sign cannot be derived from a picture of a camel; Gandz proposes "weapon" or "battle-axe".']}),
+
+ N('ugar', 'psin','𐎀','𐎁','𐎂','f-uga', ['ʾalpa','beta','gamla'], {0:[
+   'Те же три буквы, но выдавленные клином по глине. Угаритские абецедарии дают «древнейшее прямое свидетельство не только порядка „abc“, но и порядка „hlḥm“» — обоих алфавитных порядков сразу.',
+   'The same three letters, pressed into clay with a wedge. The Ugarit abecedaries give "the earliest direct evidence of not just the ‘abc’ alphabetical order but also the ‘hlḥm’ order" — both at once.']}),
+
+ N('phn',  'psin','𐤀','𐤁','𐤂','f-phn', ['ʾālep','bēt','gīml'], {
+   0:['Согласный знак гортанной смычки [ʔ]. Имя значит «бык».','A consonant sign for the glottal stop [ʔ]. The name means "ox".'],
+   2:['Числовое значение — 3.','Its numeric value is 3.']}),
+
+ N('osa',  'psin','𐩱','𐩨','𐩴','f-osa', ['ʾalef','bēt','gīml'], {0:[
+   'Здесь другой алфавитный порядок — halaḥam, а не abgd. Эти три буквы в нём не первые, а просто буквы.',
+   'This branch uses a different alphabetical order — halaḥam, not abgd. These three are not its first letters, just letters.']}),
+
+ N('geez', 'osa', 'አ','በ','ገ','f-eth', ['ʾalf','bet','gäml'], {}),
+ N('paleo','phn', '𐤀','𐤁','𐤂','f-phn', ['ʾalef','bet','gimel'], {}),
+ N('sam',  'paleo','ࠀ','ࠁ','ࠂ','f-sam', ['alaf','bit','gaman'], {}),
+ N('aram', 'phn', '𐡀','𐡁','𐡂','f-ara', ['ʾaleph','bēth','gāmal'], {}),
+ N('heb',  'aram','א','ב','ג','f-heb', ['ʾalef','bet','gimel'], {}),
+ N('nab',  'aram','𐢁','𐢃','𐢄','f-nab', ['ʾaleph','bēth','gīmel'], {}),
+
+ N('arab', 'nab', 'ا','ب','ج','f-arb', ['ʾalif','bāʾ','jīm'], {
+   0:['Показаны изолированные формы: внутри слова арабские буквы меняют вид.',
+      'Shown in isolated form: inside a word Arabic letters change shape.'],
+   2:['В старом абджадном порядке джим стоит третьей, как и гимель. В нынешнем арабском порядке она сдвинулась на пятое место.',
+      'In the old abjadī order jīm stands third, like gimel. In the modern Arabic order it has moved to fifth place.']}),
+
+ N('palm', 'aram','𐡠','𐡡','𐡢','f-pal', ['ʾaleph','bēth','gāmal'], {}),
+ N('syr',  'palm','ܐ','ܒ','ܓ','f-syr', ['ʾālap','bēth','gāmal'], {}),
+ N('sogd', 'syr', '𐼰','𐼱','𐼲','f-sog', ['ʾaleph','bēth','gimel'], {}),
+ N('uyg',  'sogd','𐽰','𐽱','𐽲','f-uyg', ['ʾaleph','bēth','gimel-heth'], {}),
+
+ N('mong', 'uyg', 'ᠠ','ᠪ','ᠭ','f-mon', ['a','ba','ga'], {0:[
+   'Монгольский порядок букв уже не абджадный, так что «первые три» здесь условны: показаны a, ba, ga в изолированной форме. Письмо идёт вертикальными строками слева направо.',
+   'The Mongolian letter order is no longer abjadic, so "the first three" is a convention here: a, ba and ga are shown in isolated form. The script runs in vertical lines, left to right.']}),
+
+ N('mand', 'aram','ࡀ','ࡁ','ࡂ','f-man', ['halqa','ab','ag'], {}),
+
+ N('grk',  'phn', 'Α','Β','Γ','f-lat', ['альфа / alpha','бета / beta','гамма / gamma'], {
+   0:['Тот самый момент: согласный становится гласным /a/. Первая буква для гласного звука в истории письма.',
+      'The moment itself: a consonant becomes the vowel /a/. The first letter for a vowel sound in the history of writing.'],
+   1:['У беты «самое большое число резко расходящихся местных форм» из всех греческих букв (Jeffery, 1961).',
+      'Beta "had the largest number of highly divergent local forms" of all Greek letters (Jeffery 1961).'],
+   2:['«В архаической Греции форма гаммы была ближе к классической лямбде (Λ), тогда как лямбда сохраняла финикийскую L-образную форму» — какое-то время они выглядели наоборот.',
+      '"In Archaic Greece, the shape of gamma was closer to a classical lambda (Λ), while lambda retained the Phoenician L-shape" — for a while the two looked swapped.']}),
+
+ N('etr',  'grk', '𐌀','𐌁','𐌂','f-ita', ['a','be','ke'], {
+   1:['Буква в алфавите есть, но этруски ею практически не писали: звонких смычных в языке не было. Она проехала через этрусский как пассажир — и досталась латинянам, которым /b/ был нужен.',
+      'The letter is in the alphabet, but the Etruscans barely wrote with it: their language had no voiced stops. It rode through Etruscan as a passenger and reached the Latins, who needed /b/.'],
+   2:['Греческую гамму со звуком /g/ этруски приспособили под /k/. Отсюда вся дальнейшая путаница латинской C.',
+      'The Etruscans repurposed Greek gamma with its /g/ for /k/. All the later confusion around Latin C starts here.']}),
+
+ N('lat',  'etr', 'A','B','C','f-lat', ['A a','B b','C c · G g'], {2:[
+   'Одна буква C веками обслуживала и /k/, и /g/. Около 230 г. до н. э. к ней добавили штрих и получили G, поставив новую букву на седьмое место — туда, где раньше стояла выброшенная Z.',
+   'A single letter C served both /k/ and /g/ for centuries. Around 230 BCE a stroke was added to make G, and the new letter took seventh place — the slot of the discarded Z.']}),
+
+ N('copt', 'grk', 'Ⲁ','Ⲃ','Ⲅ','f-cop', ['альфа / alfa','вида / vida','гамма / gamma'], {}),
+ N('goth', 'grk', '𐌰','𐌱','𐌲','f-got', ['ahsa','bairkan','giba'], {}),
+
+ N('glag', 'grk', 'Ⰰ','Ⰱ','Ⰳ','f-gla', ['азъ / azŭ','буки / buky','глаголи / glagoli'], {2:[
+   'В глаголице и кириллице этот знак стоит четвёртым, а не третьим: перед ним вклинилась добавленная буква буки.',
+   'In Glagolitic and Cyrillic this sign stands fourth, not third: the added letter buky was wedged in before it.']}),
+
+ N('cyr',  'grk', 'А','В','Г','f-lat', ['аз / az','веди / vedi','глаголь / glagol'], {1:[
+   'Наследник беты в кириллице — это В, а не Б: к византийскому времени греческая бета звучала уже как /v/. Буква Б была добавлена отдельно, чтобы записать звук /b/, которого в греческом к тому моменту не осталось.',
+   'The heir of beta in Cyrillic is В, not Б: by Byzantine times Greek beta was pronounced /v/. The letter Б was added separately to write the /b/ that Greek no longer had.']}),
+
+ N('arm',  'grk', 'Ա','Բ','Գ','f-arm', ['айб / ayb','бен / ben','гим / gim'], {0:[
+   'Имена первых букв — айб, бен, гим — тот же ряд ʾалеф-бет-гимель, хотя знаки придуманы заново.',
+   'The names of the first letters — ayb, ben, gim — are the same ʾaleph-beth-gimel series, though the shapes were made anew.']}),
+
+ N('geo',  'grk', 'ა','ბ','გ','f-geo', ['ан / an','бан / ban','ган / gan'], {0:[
+   'Связь с греческим здесь держится на порядке букв и их именах — ан, бан, ган, — а не на форме знаков.',
+   'The link to Greek here rests on the order and the letter names — an, ban, gan — not on the shapes.']})
 ];
 
-function tree(spec){
-  var out = [];
-  spec.forEach(function(r){ out.push(L(r[0], r[1], r[2], r[3], r[4], r[5])); });
-  return out;
+/* имена букв записаны как «ru / en» там, где они различаются */
+function half(str){
+  var i = str.indexOf(' / ');
+  if(i < 0) return str;
+  return LANG === 'ru' ? str.slice(0, i) : str.slice(i + 3);
 }
 
-var ALEPH = tree([
- ['cun',  null,  '𒀀','f-cun',['знак A','sign A'], SPINE[0][5]],
- ['egy',  'cun', '𓃾','f-egy',['голова быка (F1)','ox head (F1)'], [
-   'Предполагаемый прообраз. Связь хеджирована: «возможно восходит». Не путать с египетским «алефом» — знаком грифа (G1), это другой иероглиф.',
-   'The presumed prototype, hedged in the sources as "may have been based on". Not to be confused with the Egyptian "aleph", the vulture sign (G1) — a different hieroglyph.']],
- ['psin', 'egy', 'ox',null,   ['ʾalp — «бык»','ʾalp — "ox"'], [
-   'По акрофоническому принципу знак читается как первый звук семитского *ʾalp, «бык».',
-   'By acrophony the sign is read as the first sound of Semitic *ʾalp, "ox".']],
- ['ugar', 'psin','𐎀','f-uga',['ʾalpa','ʾalpa'], null],
- ['phn',  'psin','𐤀','f-phn',['ʾālep','ʾālep'], [
-   'Согласный знак гортанной смычки [ʔ]. Имя значит «бык».',
-   'A consonant sign for the glottal stop [ʔ]. The name means "ox".']],
- ['osa',  'psin','𐩱','f-osa',['ʾalef','ʾalef'], null],
- ['geez', 'osa', 'አ','f-eth', ['ʾalf','ʾalf'], null],
- ['paleo','phn', '𐤀','f-phn',['ʾalef','ʾalef'], null],
- ['sam',  'paleo','ࠀ','f-sam',['alaf','alaf'], null],
- ['aram', 'phn', '𐡀','f-ara',['ʾaleph','ʾaleph'], null],
- ['heb',  'aram','א','f-heb', ['ʾalef','ʾalef'], null],
- ['nab',  'aram','𐢁','f-nab',['ʾaleph','ʾaleph'], null],
- ['arab', 'nab', 'ا','f-arb', ['ʾalif','ʾalif'], [
-   'Первая буква и арабского, и старого абджадного порядка. Показана изолированная форма: в слове она меняется.',
-   'The first letter of both the modern order and the old abjadī order. Shown in isolated form: inside a word it changes.']],
- ['palm', 'aram','𐡠','f-pal',['ʾaleph','ʾaleph'], null],
- ['syr',  'palm','ܐ','f-syr', ['ʾālap','ʾālap'], null],
- ['sogd', 'syr', '𐼰','f-sog',['ʾaleph','ʾaleph'], null],
- ['uyg',  'sogd','𐽰','f-uyg',['ʾaleph','ʾaleph'], null],
- ['mong', 'uyg', 'ᠠ','f-mon', ['a','a'], null],
- ['mand', 'aram','ࡀ','f-man', ['halqa','halqa'], null],
- ['grk',  'phn', 'Α','f-lat', ['альфа','alpha'], [
-   'Тот самый момент: согласный становится гласным /a/. Первая буква для гласного звука в истории письма.',
-   'The moment itself: a consonant becomes the vowel /a/. The first letter for a vowel sound in the history of writing.']],
- ['etr',  'grk', '𐌀','f-ita',['a','a'], null],
- ['lat',  'etr', 'A','f-lat', ['A a','A a'], null],
- ['copt', 'grk', 'Ⲁ','f-cop', ['альфа','alfa'], null],
- ['goth', 'grk', '𐌰','f-got',['ahsa','ahsa'], null],
- ['glag', 'grk', 'Ⰰ','f-gla', ['азъ','azŭ'], null],
- ['cyr',  'grk', 'А','f-lat', ['аз','az'], null],
- ['arm',  'grk', 'Ա','f-arm', ['айб','ayb'], null],
- ['geo',  'grk', 'ა','f-geo', ['ан','an'], null]
-]);
-
-var BETH = tree([
- ['cun',  null,  '𒁀','f-cun',['знак BA','sign BA'], SPINE[0][5]],
- ['egy',  'cun', '𓉐','f-egy',['дом, pr (O1)','house, pr (O1)'], [
-   'План обнесённой стеной постройки с открытым дверным проёмом. Связь хеджирована как «возможная»; вдобавок собственный египетский знак для /b/ был другим — нога с голенью (D58).',
-   'The floor plan of a walled building with an open doorway. The link is hedged as "possible"; and the Egyptian sign for /b/ itself was a different one — the foot and calf (D58).']],
- ['psin', 'egy', 'ox',null,   ['bayt — «дом»','bayt — "house"'], [
-   'Прямоугольник, частично открытый с одной стороны. Звук /b/ по первому согласному семитского *baytu, «дом»; значение знаку приписал Алан Гардинер в 1916 году.',
-   'A rectangle partially open along one side. The sound /b/ from the first consonant of Semitic *baytu, "house"; the value was assigned by Alan Gardiner in 1916.']],
- ['ugar', 'psin','𐎁','f-uga',['beta','beta'], null],
- ['phn',  'psin','𐤁','f-phn',['bēt','bēt'], [
-   'От него пошли греческая бета, латинская B, кириллические Б и В, армянская бен. Еврейская ב — не потомок, а параллельное развитие того же знака.',
-   'From it came Greek beta, Latin B, Cyrillic Be and Ve, Armenian ben. Hebrew ב is not a descendant but a parallel development of the same sign.']],
- ['osa',  'psin','𐩨','f-osa',['bēt','bēt'], null],
- ['geez', 'osa', 'በ','f-eth', ['bet','bet'], null],
- ['paleo','phn', '𐤁','f-phn',['bet','bet'], null],
- ['sam',  'paleo','ࠁ','f-sam',['bit','bit'], null],
- ['aram', 'phn', '𐡁','f-ara',['bēth','bēth'], null],
- ['heb',  'aram','ב','f-heb', ['bet','bet'], null],
- ['nab',  'aram','𐢃','f-nab',['bēth','bēth'], null],
- ['arab', 'nab', 'ب','f-arb', ['bāʾ','bāʾ'], null],
- ['palm', 'aram','𐡡','f-pal',['bēth','bēth'], null],
- ['syr',  'palm','ܒ','f-syr', ['bēth','bēth'], null],
- ['mand', 'aram','ࡁ','f-man', ['ab','ab'], null],
- ['grk',  'phn', 'Β','f-lat', ['бета','beta'], [
-   'У беты «самое большое число резко расходящихся местных форм» из всех греческих букв (Jeffery, 1961): свои были у Гортины, Феры, Аргоса, Мелоса, Коринфа, Мегар и Византия.',
-   'Beta "had the largest number of highly divergent local forms" of all Greek letters (Jeffery 1961): Gortyn, Thera, Argos, Melos, Corinth, Megara and Byzantium each had their own.']],
- ['etr',  'grk', '𐌁','f-ita',['be','be'], [
-   'Буква в алфавите есть, но этруски ею практически не писали: звонких смычных в языке не было. Она проехала через этрусский как пассажир — и досталась латинянам, которым /b/ был нужен.',
-   'The letter is in the alphabet, but the Etruscans barely wrote with it: their language had no voiced stops. It rode through Etruscan as a passenger and reached the Latins, who needed /b/.']],
- ['lat',  'etr', 'B','f-lat', ['B b','B b'], null],
- ['copt', 'grk', 'Ⲃ','f-cop', ['вида','vida'], null],
- ['goth', 'grk', '𐌱','f-got',['bairkan','bairkan'], null],
- ['glag', 'grk', 'Ⰱ','f-gla', ['буки','buky'], null],
- ['cyr',  'grk', 'В','f-lat', ['веди','vedi'], [
-   'Наследник беты в кириллице — это В, а не Б: к византийскому времени греческая бета звучала уже как /v/. Буква Б была добавлена отдельно, чтобы записать звук /b/, которого в греческом к тому моменту не осталось.',
-   'The heir of beta in Cyrillic is В, not Б: by Byzantine times Greek beta was pronounced /v/. The letter Б was added separately to write the /b/ that Greek no longer had.']],
- ['arm',  'grk', 'Բ','f-arm', ['бен','ben'], null],
- ['geo',  'grk', 'ბ','f-geo', ['бан','ban'], null]
-]);
-
-var GIMEL = tree([
- ['cun',  null,  '𒂵','f-cun',['знак GA','sign GA'], SPINE[0][5]],
- ['egy',  'cun', '𓌙','f-egy',['метательная палка (T14)','throwstick (T14)'], [
-   'Знак восходит к додинастическому времени. Источники расходятся даже в том, что изображено: посох-праща, метательная палка или дубина.',
-   'The sign dates from the Predynastic Period. The sources differ even on what is depicted: a staff sling, a throwing stick, or a club.']],
- ['psin', 'egy', 'ox',null,   ['gaml','gaml'], [
-   'Изогнутая метательная палка. Имя оспаривается: «верблюд» — популярное толкование, но Пауэлл возражает, что из рисунка верблюда такой знак не выводится; Ганц предлагает «оружие» или «боевой топор».',
-   'A bent throwstick. The name is disputed: "camel" is the popular reading, but Powell objects that such a sign cannot be derived from a picture of a camel; Gandz proposes "weapon" or "battle-axe".']],
- ['ugar', 'psin','𐎂','f-uga',['gamla','gamla'], null],
- ['phn',  'psin','𐤂','f-phn',['gīml','gīml'], [
-   'Звонкий заднеязычный /g/. Числовое значение — 3.',
-   'The voiced velar /g/. Its numeric value is 3.']],
- ['osa',  'psin','𐩴','f-osa',['gīml','gīml'], null],
- ['geez', 'osa', 'ገ','f-eth', ['gäml','gäml'], null],
- ['paleo','phn', '𐤂','f-phn',['gimel','gimel'], null],
- ['sam',  'paleo','ࠂ','f-sam',['gaman','gaman'], null],
- ['aram', 'phn', '𐡂','f-ara',['gāmal','gāmal'], null],
- ['heb',  'aram','ג','f-heb', ['gimel','gimel'], null],
- ['nab',  'aram','𐢄','f-nab',['gīmel','gīmel'], null],
- ['arab', 'nab', 'ج','f-arb', ['jīm','jīm'], [
-   'В старом абджадном порядке джим стоит третьей, как и гимель. В нынешнем арабском порядке она сдвинулась на пятое место.',
-   'In the old abjadī order jīm stands third, just like gimel. In the modern Arabic order it has moved to fifth place.']],
- ['palm', 'aram','𐡢','f-pal',['gāmal','gāmal'], null],
- ['syr',  'palm','ܓ','f-syr', ['gāmal','gāmal'], null],
- ['mand', 'aram','ࡂ','f-man', ['ag','ag'], null],
- ['grk',  'phn', 'Γ','f-lat', ['гамма','gamma'], [
-   '«В архаической Греции форма гаммы была ближе к классической лямбде (Λ), тогда как лямбда сохраняла финикийскую L-образную форму» — какое-то время они выглядели наоборот.',
-   '"In Archaic Greece, the shape of gamma was closer to a classical lambda (Λ), while lambda retained the Phoenician L-shape" — for a while the two looked swapped.']],
- ['etr',  'grk', '𐌂','f-ita',['ke','ke'], [
-   'В этрусском не было противопоставления по звонкости, поэтому греческую гамму со звуком /g/ приспособили под /k/. Отсюда вся дальнейшая путаница латинской C.',
-   'Etruscan had no voicing contrast, so Greek gamma with its /g/ was repurposed for /k/. All the later confusion around Latin C starts here.']],
- ['lat',  'etr', 'C','f-lat', ['C c · G g','C c · G g'], [
-   'Одна буква C веками обслуживала и /k/, и /g/. Около 230 г. до н. э. к ней добавили штрих и получили G, поставив новую букву на седьмое место — туда, где раньше стояла выброшенная Z.',
-   'A single letter C served both /k/ and /g/ for centuries. Around 230 BCE a stroke was added to it to make G, and the new letter took seventh place — the slot of the discarded Z.']],
- ['copt', 'grk', 'Ⲅ','f-cop', ['гамма','gamma'], null],
- ['goth', 'grk', '𐌲','f-got',['giba','giba'], null],
- ['glag', 'grk', 'Ⰳ','f-gla', ['глаголи','glagoli'], [
-   'В глаголице и кириллице этот знак стоит четвёртым, а не третьим: перед ним вклинилась добавленная буква буки/Б.',
-   'In Glagolitic and Cyrillic this sign stands fourth, not third: the added letter buky/Б was wedged in before it.']],
- ['cyr',  'grk', 'Г','f-lat', ['глаголь','glagol'], null],
- ['arm',  'grk', 'Գ','f-arm', ['гим','gim'], null],
- ['geo',  'grk', 'გ','f-geo', ['ган','gan'], null]
-]);
-
-var TREES = [{k:0, nodes:ALEPH}, {k:1, nodes:BETH}, {k:2, nodes:GIMEL}];
+var LETTERS = [
+  [['ʾАЛЕФ','ʾALEPH'], ['бык','ox']],
+  [['БЕТ','BETH'],     ['дом','house']],
+  [['ГИМЕЛЬ','GIMEL'], ['палка','stick']]
+];
 
 /* ═══ раскладка ═══ */
-var COLP = 232, ROWH = 56, NODEW = 182, GAPY = 170;
-var all = [], lines = [], titles = [], worldW = 0, worldH = 96;
+var COLP = 248, ROWH = 86, NODEW = 196, GW = 34, GGAP = 13;
+var byId = {}, kids = {}, lines = [], worldW = 0, worldH = 0;
 
-TREES.forEach(function(T, ti){
-  var ns = T.nodes, byId = {}, kids = {};
-  ns.forEach(function(n){ n.id = ti + ':' + n.sc; byId[n.sc] = n; kids[n.sc] = []; });
-  ns.forEach(function(n){ if(n.p && byId[n.p]) kids[n.p].push(n); });
-  ns.forEach(function(n){
-    var c = 0, cur = n;
-    while(cur.p && byId[cur.p]){ cur = byId[cur.p]; c++; }
-    n.col = c;
-  });
+TREE.forEach(function(n){ byId[n.sc] = n; kids[n.sc] = []; });
+TREE.forEach(function(n){ if(n.p && byId[n.p]) kids[n.p].push(n); });
+TREE.forEach(function(n){
+  var c = 0, cur = n;
+  while(cur.p && byId[cur.p]){ cur = byId[cur.p]; c++; }
+  n.col = c;
+});
+(function(){
   var lane = 0;
   (function walk(n){
     var ch = kids[n.sc];
     if(!ch.length){ n.row = lane++; return; }
     ch.forEach(walk);
     n.row = (ch[0].row + ch[ch.length - 1].row) / 2;
-  })(ns[0]);
-
-  var baseY = worldH;
-  ns.forEach(function(n){
-    n.x = n.col * COLP;
-    n.y = baseY + n.row * ROWH + ROWH / 2;
-    n.tree = T;
-    all.push(n);
-    worldW = Math.max(worldW, n.x + NODEW);
-  });
-  ns.forEach(function(n){
-    if(!n.p || !byId[n.p]) return;
-    var a = byId[n.p];
-    lines.push({sx:a.x + NODEW - 6, sy:a.y, ex:n.x - 10, ey:n.y, hedge:(n.sc === 'egy')});
-  });
-  var l = UI.letters[ti];
-  titles.push({x:0, y:baseY - 74, big: LANG === 'ru' ? l[0] : l[2], small: LANG === 'ru' ? l[1] : l[3]});
-  worldH = baseY + lane * ROWH + GAPY;
+  })(TREE[0]);
+  worldH = lane * ROWH + 40;
+})();
+TREE.forEach(function(n){
+  n.x = n.col * COLP;
+  n.y = 96 + n.row * ROWH + ROWH / 2;
+  worldW = Math.max(worldW, n.x + NODEW);
+});
+worldH += 120;
+TREE.forEach(function(n){
+  if(!n.p || !byId[n.p]) return;
+  var a = byId[n.p];
+  lines.push({sx:a.x + NODEW - 6, sy:a.y, ex:n.x - 10, ey:n.y, hedge:(n.sc === 'egy')});
 });
 
 /* ═══ отрисовка ═══ */
 var world = document.getElementById('world');
 var stage = document.getElementById('stage');
 var pop = document.getElementById('pop');
-var openId = null, byKey = {};
+var openId = null;
 
 document.getElementById('head').innerHTML =
   '<h1>' + T(UI.title) + '</h1><p>' + T(UI.sub) + '</p>' +
   '<p style="margin-top:7px">' + T(UI.hint) + '</p>' +
   '<p style="margin-top:7px">' + T(UI.links) + '</p>';
 
+function glyphHTML(g, px){
+  if(!g) return '<span class="gl none" style="width:' + px + 'px;height:' + px + 'px"></span>';
+  if(typeof g === 'string') return '<span class="gl" style="width:' + px + 'px;height:' + px + 'px">' + svgSign(g) + '</span>';
+  return '<span class="gl ' + g[1] + '" style="width:' + px + 'px;height:' + px + 'px;font-size:' + px + 'px">' + g[0] + '</span>';
+}
+
 (function draw(){
-  var svgNS = 'http://www.w3.org/2000/svg';
-  var svg = document.createElementNS(svgNS, 'svg');
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', 'lines');
   svg.setAttribute('width', worldW + 40);
   svg.setAttribute('height', worldH + 40);
@@ -576,47 +563,50 @@ document.getElementById('head').innerHTML =
   svg.innerHTML = '<path d="' + d + '"/><path class="hedge" d="' + dh + '"/>';
   world.appendChild(svg);
 
-  titles.forEach(function(t){
-    var el = document.createElement('div');
-    el.className = 'ttl';
-    el.style.left = t.x + 'px'; el.style.top = t.y + 'px';
-    el.innerHTML = t.big + '<i>' + t.small + '</i>';
-    world.appendChild(el);
-  });
+  /* подпись столбца букв над первым узлом */
+  var key = document.createElement('div');
+  key.className = 'key';
+  key.style.left = TREE[0].x + 'px';
+  key.style.top = (TREE[0].y - ROWH / 2 - 36) + 'px';
+  key.innerHTML = LETTERS.map(function(l, i){
+    return '<span style="width:' + GW + 'px;margin-right:' + GGAP + 'px">' +
+           T(l[0]) + '<i>' + T(l[1]) + '</i></span>';
+  }).join('');
+  world.appendChild(key);
 
-  all.forEach(function(n){
+  TREE.forEach(function(n){
     var s = SC[n.sc];
     var b = document.createElement('button');
     b.className = 'node'; b.type = 'button';
     b.setAttribute('aria-expanded', 'false');
     b.setAttribute('aria-label', T(s.n));
-    b.dataset.id = n.id;
+    b.dataset.id = n.sc;
     b.style.left = n.x + 'px'; b.style.top = (n.y - ROWH / 2) + 'px';
     b.style.width = NODEW + 'px'; b.style.height = ROWH + 'px';
-    var g = n.g === 'ox' ? '<span class="gl" style="width:34px;height:34px">' + svgOx() + '</span>'
-          : n.g ? '<span class="gl ' + n.g[1] + '" style="width:34px;height:34px;font-size:34px">' + n.g[0] + '</span>'
-                : '<span class="gl none" style="width:34px;height:34px"></span>';
-    b.innerHTML = g + '<span class="tx"><span class="nm">' + T(s.n) + '</span>' +
-                  '<span class="dt">' + T(n.ln) + ' · ' + T(s.d) + '</span></span>';
+    b.innerHTML =
+      '<span class="row">' + n.g.map(function(g){ return glyphHTML(g, GW); }).join('') + '</span>' +
+      '<span class="nm">' + T(s.n) + '</span>' +
+      '<span class="dt">' + n.ln.map(half).join(' · ') + '</span>' +
+      '<span class="dt">' + T(s.d) + '</span>';
     world.appendChild(b);
     n._el = b;
-    byKey[n.id] = n;
   });
 })();
 
 /* ═══ карточка ═══ */
 function popHTML(n){
   var s = SC[n.sc];
-  var h = '<div class="pg">';
-  if(n.g === 'ox') h += svgOx();
-  else if(n.g)     h += '<span class="' + n.g[1] + '" style="font-size:66px;line-height:1">' + n.g[0] + '</span>';
-  else             h += '<span style="font-size:14px;color:var(--ink-45);line-height:1.3">' + T(UI.noUni) + '</span>';
-  h += '</div>';
+  var h = '<div class="trio">' + n.g.map(function(g, i){
+      return '<span class="one">' + glyphHTML(g, 52) +
+             '<i>' + half(n.ln[i]) + '</i></span>';
+    }).join('') + '</div>';
   h += '<p class="pt">' + T(s.n) + '</p>';
-  h += '<p class="pl">' + T(n.ln) + '</p>';
   h += '<p class="pm">' + T(s.m) + ' · ' + T(s.d) + '</p>';
-  if(n.note) h += '<p class="pd">' + T(n.note) + '</p>';
   s.x.forEach(function(x){ h += '<p class="pd">' + T(x) + '</p>'; });
+  [0, 1, 2].forEach(function(i){
+    if(!n.nt[i]) return;
+    h += '<p class="pd pn"><b>' + half(n.ln[i]) + '.</b> ' + T(n.nt[i]) + '</p>';
+  });
   if(s.u) h += '<p class="pu">' + s.u + '</p>';
   h += '<p class="ps">' + s.s.map(function(x){
          var ext = /^https?:/.test(x[1]) ? ' target="_blank" rel="noopener"' : '';
@@ -640,7 +630,7 @@ function placePop(n){
   pop.style.top = Math.round(top) + 'px';
 }
 function showPop(id){
-  var n = byKey[id]; if(!n) return;
+  var n = byId[id]; if(!n) return;
   openId = id;
   pop.innerHTML = popHTML(n);
   pop.classList.add('on');
@@ -662,26 +652,26 @@ function hidePop(){
 var tx = 0, ty = 0, k = 1;
 function apply(){
   world.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + k + ')';
-  if(openId) placePop(byKey[openId]);
+  if(openId) placePop(byId[openId]);
 }
 function headroom(){ return document.documentElement.clientWidth < 700 ? 196 : 182; }
-function fit(){                                   /* клавиша 0 — весь обзор */
+function fit(){
   var vw = stage.clientWidth, vh = stage.clientHeight;
   var padL = 30, padT = headroom(), padR = 34, padB = 34;
   k = Math.min((vw - padL - padR) / (worldW + 40), (vh - padT - padB) / (worldH + 40));
   k = Math.max(0.06, Math.min(1, k));
-  tx = padL; ty = padT;
-  apply();
+  tx = padL; ty = padT; apply();
 }
-function home(){                                  /* стартовый вид — читаемый */
-  var vw = stage.clientWidth;
-  k = vw < 700 ? 0.62 : 0.84;
-  tx = vw < 700 ? 14 : 40;
-  ty = headroom();
+function home(){
+  var vw = stage.clientWidth, vh = stage.clientHeight;
+  k = vw < 700 ? 0.56 : 0.8;
+  tx = vw < 700 ? 12 : 36;
+  var root = TREE[0];
+  ty = Math.min(headroom(), vh * 0.52 - root.y * k);   /* корень — по центру слева */
   apply();
 }
 function zoomAt(cx, cy, nk){
-  nk = Math.max(0.08, Math.min(4, nk));
+  nk = Math.max(0.06, Math.min(4, nk));
   tx = cx - (cx - tx) * (nk / k);
   ty = cy - (cy - ty) * (nk / k);
   k = nk; apply();
@@ -689,17 +679,13 @@ function zoomAt(cx, cy, nk){
 
 stage.addEventListener('wheel', function(e){
   e.preventDefault();
-  if(e.ctrlKey || e.metaKey){
-    zoomAt(e.clientX, e.clientY, k * Math.exp(-e.deltaY * 0.012));
-  }else{
-    tx -= e.deltaX; ty -= e.deltaY; apply();
-  }
+  if(e.ctrlKey || e.metaKey) zoomAt(e.clientX, e.clientY, k * Math.exp(-e.deltaY * 0.012));
+  else { tx -= e.deltaX; ty -= e.deltaY; apply(); }
 }, {passive:false});
 
 var drag = null;
 stage.addEventListener('pointerdown', function(e){
   if(e.target.closest('.node') || e.target.closest('#pop')) return;
-  if(e.pointerType === 'touch' && e.isPrimary === false) return;
   drag = {x:e.clientX, y:e.clientY, tx:tx, ty:ty, id:e.pointerId, moved:false};
   stage.setPointerCapture(e.pointerId);
   stage.classList.add('grabbing');
@@ -714,18 +700,15 @@ stage.addEventListener('pointermove', function(e){
 function endDrag(e){
   if(!drag || (e && e.pointerId !== drag.id)) return;
   if(!drag.moved) hidePop();
-  drag = null;
-  stage.classList.remove('grabbing');
+  drag = null; stage.classList.remove('grabbing');
 }
 stage.addEventListener('pointerup', endDrag);
 stage.addEventListener('pointercancel', endDrag);
 
-/* щипок на экране */
 var pts = {}, pinch = null;
 stage.addEventListener('pointerdown', function(e){ if(e.pointerType === 'touch') pts[e.pointerId] = e; });
 stage.addEventListener('pointermove', function(e){
-  if(e.pointerType !== 'touch') return;
-  if(!(e.pointerId in pts)) return;
+  if(e.pointerType !== 'touch' || !(e.pointerId in pts)) return;
   pts[e.pointerId] = e;
   var ids = Object.keys(pts);
   if(ids.length !== 2){ pinch = null; return; }
@@ -751,8 +734,7 @@ world.addEventListener('pointerover', function(e){
   clearTimeout(hideTimer); showPop(b.dataset.id);
 });
 world.addEventListener('pointerout', function(e){
-  if(!hoverCapable) return;
-  if(!e.target.closest('.node')) return;
+  if(!hoverCapable || !e.target.closest('.node')) return;
   if(e.relatedTarget && (pop.contains(e.relatedTarget) || e.relatedTarget.closest('.node'))) return;
   hideTimer = setTimeout(hidePop, 220);
 });
@@ -765,12 +747,11 @@ world.addEventListener('click', function(e){
 });
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape') hidePop();
-  if(e.key === '0'){ fit(); }
+  if(e.key === '0') fit();
 });
 window.addEventListener('resize', function(){ hidePop(); apply(); });
 
 home();
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ /* шрифты не меняют раскладку */ });
 })();
 </script>
 </body>
