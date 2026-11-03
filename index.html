@@ -61,7 +61,7 @@
   .gl{flex:0 0 auto;display:flex;align-items:center;justify-content:center;line-height:1}
   .gl.none::after{content:"";display:block;width:62%;height:1px;background:var(--rule)}
   .gl svg{display:block;width:100%;height:100%}
-  .gl svg path{fill:none;stroke:currentColor;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+  .gl svg path{fill:none;stroke:currentColor;stroke-width:var(--sw,6);stroke-linecap:round;stroke-linejoin:round}
   .node .nm{display:block;line-height:1.14;font-size:14.5px}
   .node .dt{display:block;color:var(--ink-45);line-height:1.28;font-size:10.5px}
 
@@ -213,8 +213,8 @@ var DRAWN = {
   orc_a: ["M44 16 C58 11 70 14 72 21","M44 16 L28 60 C25 77 46 87 64 78","M72 19 L72 81"],
   nrc_a: ["M66 40 C56 30 34 32 28 48 C22 66 36 80 52 76 C60 74 66 66 66 58","M66 30 L66 80"],
   unc_A: ["M72 18 C44 24 26 44 26 62 C26 78 44 84 60 76 C68 72 72 66 72 58","M72 18 L72 80"],
-  hunc_a: ["M66 42 C58 33 39 33 32 46 C25 61 34 78 50 78 C60 78 66 71 66 61","M66 36 L66 80"],
-  car_a: ["M68 47 C60 37 40 37 33 50 C26 65 35 79 51 79 C62 79 68 71 68 62","M68 30 L68 81"],
+  hunc_a: ["M66 42 C58 33 39 33 32 46 C25 61 34 78 50 78 C60 78 66 71 66 61","M66 40 L66 80"],
+  car_a: ["M68 47 C60 37 40 37 33 50 C26 65 35 79 51 79 C62 79 68 71 68 62","M68 44 L68 81"],
   gk_b_arch: ["M28 14 L28 86","M28 14 L62 24 L28 48","M28 48 L66 60 L28 86"],
   gk_b_west: ["M30 14 L30 86","M30 14 C62 14 66 44 30 48","M30 48 C68 48 72 86 30 86"],
   lat_B_old: ["M30 14 L30 86","M30 14 C56 16 58 40 30 44","M30 44 C66 46 68 86 30 86"],
@@ -320,7 +320,9 @@ var SC = {
 
  latUnc:{n:['Унциал','Uncial'], d:['IV–VIII вв.','4th–8th c. CE'],
    m:['Латинский и греческий Запад','the Latin and Greek West'],
-   x:[['«Маюскульное письмо, широко употреблявшееся с IV по VIII век латинскими и греческими писцами». Широкие одномоментные штрихи круглых форм: пергамен позволял то, чего не позволял папирус.',
+   x:[['Если эти почерки кажутся похожими — так и есть, и скелет тут ни при чём. Унциал, полуунциал, каролингский минускул и гуманистический различаются прежде всего углом пера, контрастом толстого и тонкого, пропорцией и порядком штрихов. На карте показан скелет буквы, а скелет как раз почти не меняется. Разница в весе штриха здесь передана условно, по описаниям; увидеть её по-настоящему можно только на развороте рукописи.',
+       'If these hands look alike — they do, and the skeleton is not the reason. Uncial, half-uncial, Carolingian and humanist minuscule differ above all in pen angle, thick-thin contrast, proportion and stroke order. This map shows the skeleton of the letter, and the skeleton is exactly what barely changes. The difference in stroke weight here is indicative, drawn from the descriptions; to see it properly you need an opening of a manuscript.'],
+      ['«Маюскульное письмо, широко употреблявшееся с IV по VIII век латинскими и греческими писцами». Широкие одномоментные штрихи круглых форм: пергамен позволял то, чего не позволял папирус.',
        '"A majuscule script commonly used from the 4th to 8th centuries AD by Latin and Greek scribes." Broad single-stroke letters using simple round forms: parchment allowed what papyrus did not.'],
       ['«Ранний унциал, скорее всего, развился из позднего рустичного капитала».',
        '"Early uncial script most likely developed from late rustic capitals."']],
@@ -338,7 +340,9 @@ var SC = {
 
  latCaro:{n:['Каролингский минускул','Carolingian minuscule'], d:['конец VIII — IX в.','late 8th – 9th c.'],
    m:['Ахен, Тур, Корби','Aachen, Tours, Corbie'],
-   x:[['Создан при Карле Великом. Алкуин Йоркский руководил придворным скрипторием в Ахене в 782–796 годах, затем перестроил скрипторий в Туре.',
+   x:[['Важность этого узла не в новой форме буквы, а в том, что форма наконец ЗАФИКСИРОВАНА. До него каждый скрипторий писал по-своему; после — вся Европа пишет одинаково. Это узел стандартизации, а не изобретения.',
+       'What matters here is not a new letter shape but that the shape is finally FIXED. Before it, every scriptorium wrote its own way; after it, all of Europe writes the same. This is a node of standardisation, not invention.'],
+      ['Создан при Карле Великом. Алкуин Йоркский руководил придворным скрипторием в Ахене в 782–796 годах, затем перестроил скрипторий в Туре.',
        'Created under Charlemagne. Alcuin of York ran the palace scriptorium at Aachen from 782 to 796, then restructured the scriptorium at Tours.'],
       ['«Единообразное письмо округлых форм, ясно различимые знаки, дисциплинированное и прежде всего читаемое». Пробелы между словами и прописные для заголовков — отсюда.',
        '"Uniform with rounded shapes in clearly distinguishable glyphs, disciplined and above all, legible." Spaces between words and capitals for titles start here.']],
@@ -354,7 +358,9 @@ var SC = {
 
  latHum:{n:['Гуманистический минускул','Humanist minuscule'], d:['начало XV в.','early 15th c.'],
    m:['Флоренция','Florence'],
-   x:[['«Создателем нового стиля был Поджо Браччолини, неутомимый охотник за древними рукописями, который разработал новый гуманистический почерк в первое десятилетие XV века».',
+   x:[['И этот узел — не про форму буквы, а про то, какая ветка победит. Каролингский минускул к XV веку уже триста лет как выродился в готику; гуманисты вернулись через её голову к каролингской форме. Если бы не вернулись, вы читали бы этот текст готическим шрифтом.',
+       'This node, too, is not about letter shape but about which branch wins. By the 15th century Carolingian minuscule had been degenerating into blackletter for three hundred years; the humanists reached back over its head to the Carolingian form. Had they not, you would be reading this in blackletter.'],
+      ['«Создателем нового стиля был Поджо Браччолини, неутомимый охотник за древними рукописями, который разработал новый гуманистический почерк в первое десятилетие XV века».',
        '"The generator of the new style was Poggio Bracciolini, a tireless pursuer of ancient manuscripts, who developed the new humanist script in the first decade of the 15th century."'],
       ['В основании всей нашей типографики лежит ошибка: гуманисты приняли каролингские рукописи XI–XII веков за древнеримские. «Когда они держали в руках книги, переписанные писцами одиннадцатого и двенадцатого веков, литераторы кватроченто думали, что смотрят на тексты прямо из книжных лавок древнего Рима».',
        'A mistake sits at the root of all our typography: the humanists took 11th–12th-century Carolingian manuscripts for ancient Roman ones. "When they handled manuscript books copied by eleventh- and twelfth-century scribes, Quattrocento literati thought they were looking at texts that came right out of the bookshops of ancient Rome."']],
@@ -671,10 +677,20 @@ var SCL = {
       'Uncial is "a majuscule script (written entirely in capital letters)". A book was written in uncial from first page to last: a script in its own right, not an "upper case".'],
    0:['«В греческом почерке было принято сводить левую ногу и горизонтальный штрих в одну петлю» — отсюда и пошла наша строчная a.',
       '"In Greek handwriting, it was common to join the left leg and horizontal stroke into a single loop" — and that is where our lowercase a comes from.']}),
- latHunc:S('latUnc','hunc_a','hunc_b','hunc_c', null, ['a','b','c'], {}),
+ latHunc:S('latUnc','hunc_a','hunc_b','hunc_c', null, ['a','b','c'], {
+   0:['Здесь ⟨a⟩ становится «обычно круглой ⟨ɑ⟩, иногда со слегка открытым верхом» — то есть уже настоящей строчной, а не уменьшенной прописной.',
+      'Here a becomes "usually round, sometimes with a slightly open top" — a true lowercase letter, not a shrunken capital.'],
+   1:['Для ⟨b⟩ это конечная остановка: «⟨b⟩ и ⟨d⟩ имеют вертикальные стойки, ТОЖДЕСТВЕННЫЕ современным буквам». Всё, что идёт дальше по этой строке, букву b уже не меняет — меняется письмо вокруг неё.',
+      'For b this is the last stop: "b and d have vertical stems, IDENTICAL to the modern letters". Everything further along this row no longer changes b — what changes is the writing around it.'],
+   2:['А вот ⟨c⟩ источники на этом этапе не описывают вовсе — в отличие от ⟨a⟩, ⟨b⟩, ⟨d⟩, ⟨g⟩, ⟨n⟩, ⟨r⟩, ⟨s⟩, которым посвящены отдельные фразы. Палеографы описывают то, что меняется; про C сказать нечего. Это самая устойчивая из трёх букв: дуга остаётся дугой.',
+      'c, on the other hand, the sources do not describe at this stage at all — unlike a, b, d, g, n, r and s, each of which gets its own sentence. Palaeographers describe what changes; about C there is nothing to say. It is the most stable of the three: an arc stays an arc.']}),
  latCaro:S('latHunc','car_a','car_b','car_c', null, ['a','b','c'], {}),
  latBlack:S('latCaro','a','b','c','f-bl', ['a','b','c'], {}),
- latHum: S('latCaro','a','b','c','f-lat', ['a','b','c'], {}),
+ latHum: S('latCaro','a','b','c','f-lat', ['a','b','c'], {
+   0:['Вот где ⟨a⟩ раздваивается по-настоящему. Из каролингской формы выходят две: одноэтажная — «кружок с вертикальным штрихом справа», она уходит в курсив и рукописный почерк, и двухэтажная — «маленькая петля с дугой над ней», которая и стоит в большинстве печатных текстов.',
+      'This is where a really splits in two. Out of the Carolingian form come both: the single-storey — "a circle with a vertical stroke on its right", which goes into italic and handwriting — and the double-storey, "a small loop with an arc over it", the one in most printed text.'],
+   2:['И ⟨g⟩ здесь же: «гуманистический минускул вновь утвердил форму с замкнутым хвостом». Двухэтажная петлехвостая g — исходная, каролингская; одноэтажную Гутенберг унаследовал от монастырской скорописи, а гуманисты от неё отказались.',
+      'And g here too: humanist minuscule "reasserted the closed-tail form". The double-storey looptail g is the original, the Carolingian one; Gutenberg inherited the single-storey from monastic copying, and the humanists dropped it.']}),
 
  lat:  S('latHum', 'a','b','c','f-lat', ['a','b','c · g'], {
    0:['Двухэтажная a — наследница каролингского и гуманистического минускула. Одноэтажная ɑ (U+0251) — та же буква в рукописном и курсивном изводе.',
@@ -842,9 +858,15 @@ function half(str){
   if(i < 0) return str;
   return LANG === 'ru' ? str.slice(0, i) : str.slice(i + 3);
 }
+var WEIGHT = {rust:4.2, orc:4.6, nrc:5, unc:8.4, hunc:6.2, car:5.6, gk:5.4, lat:5.6, ps:6, ox:6, house:6, stick:6};
+function strokeOf(key){
+  var pre = key.split('_')[0];
+  return WEIGHT[pre] || WEIGHT[key] || 6;
+}
 function glyphHTML(g, px){
   if(!g) return '<span class="gl none" style="width:' + px + 'px;height:' + px + 'px"></span>';
-  if(typeof g === 'string') return '<span class="gl" style="width:' + px + 'px;height:' + px + 'px">' + svgSign(g) + '</span>';
+  if(typeof g === 'string') return '<span class="gl" style="width:' + px + 'px;height:' + px +
+    'px;--sw:' + strokeOf(g) + '">' + svgSign(g) + '</span>';
   return '<span class="gl ' + g[1] + '" style="width:' + px + 'px;height:' + px + 'px;font-size:' + Math.round(px * (g[2] || 1)) + 'px">' + g[0] + '</span>';
 }
 
