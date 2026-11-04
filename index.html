@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel&family=UnifrakturMaguntia&family=Noto+Sans+Cuneiform&family=Noto+Sans+Egyptian+Hieroglyphs&family=Noto+Sans+Ugaritic&family=Noto+Sans+Phoenician&family=Noto+Sans+Old+South+Arabian&family=Noto+Sans+Ethiopic&family=Noto+Sans+Samaritan&family=Noto+Sans+Imperial+Aramaic&family=Noto+Sans+Hebrew&family=Noto+Sans+Nabataean&family=Noto+Sans+Arabic&family=Noto+Sans+Palmyrene&family=Noto+Sans+Syriac&family=Noto+Sans+Mandaic&family=Noto+Sans+Sogdian&family=Noto+Serif+Old+Uyghur&family=Noto+Sans+Mongolian&family=Noto+Sans+Old+Italic&family=Noto+Sans+Coptic&family=Noto+Sans+Gothic&family=Noto+Sans+Glagolitic&family=Noto+Sans+Armenian&family=Noto+Sans+Georgian&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#eeeeee; --card:#ffffff; --ink:#1c1c1c;
+    --paper:#f7f7f7; --card:#ffffff; --ink:#1c1c1c;
     --ink-70:rgba(28,28,28,.70); --ink-45:rgba(28,28,28,.45);
     --ink-28:rgba(28,28,28,.28); --rule:rgba(28,28,28,.30);
   }
@@ -52,18 +52,19 @@
     text-transform:uppercase;margin-top:12px;color:var(--ink-28)}
 
   .node{
-    position:absolute;display:flex;flex-direction:row;align-items:center;gap:11px;
+    position:absolute;display:flex;flex-direction:column;align-items:center;
     background:none;border:0;padding:0;margin:0;cursor:pointer;
-    color:var(--ink);font-family:inherit;text-align:left;
+    color:var(--ink);font-family:inherit;text-align:center;
   }
   .node:focus{outline:none}
-  .node .tx{min-width:0;flex:1 1 auto}
+  .node .pair{display:flex;align-items:center;justify-content:center;gap:9px;height:40px}
+  .node .tx{min-width:0;width:100%;margin-top:7px}
   .gl{flex:0 0 auto;display:flex;align-items:center;justify-content:center;line-height:1}
   .gl.none::after{content:"";display:block;width:62%;height:1px;background:var(--rule)}
   .gl svg{display:block;width:100%;height:100%}
   .gl svg path{fill:none;stroke:currentColor;stroke-width:var(--sw,6);stroke-linecap:round;stroke-linejoin:round}
-  .node .nm{display:block;line-height:1.14;font-size:14.5px}
-  .node .dt{display:block;color:var(--ink-45);line-height:1.28;font-size:10.5px}
+  .node .nm{display:block;line-height:1.16;font-size:13px}
+  .node .dt{display:block;color:var(--ink-45);line-height:1.25;font-size:10px;margin-top:1px}
 
   .band{
     position:absolute;white-space:nowrap;pointer-events:none;
@@ -77,31 +78,43 @@
   #world.dim .node:not([aria-expanded="true"]){opacity:.4}
 
   #head{
-    position:fixed;left:26px;top:22px;z-index:20;width:min(680px,calc(100vw - 52px));
+    position:fixed;left:26px;top:18px;z-index:20;width:min(1040px,calc(100vw - 52px));
     pointer-events:none;
   }
-  #head h1{font-weight:400;font-size:25px;line-height:1.1;margin:0 0 5px}
-  #head p{margin:0;color:var(--ink-45);font-size:14.5px;line-height:1.42;max-width:56ch}
-  #head p.small{font-size:13px;margin-top:6px}
+  #head h1{font-weight:400;font-size:22px;line-height:1.1;margin:0 0 3px}
+  #head p{margin:0;color:var(--ink-45);font-size:13.5px;line-height:1.35;max-width:72ch}
+  #head p.small{font-size:12px;margin-top:3px;color:var(--ink-28)}
   #head a{pointer-events:auto;color:var(--ink-70);text-decoration:underline;text-underline-offset:3px}
 
-  #filter{pointer-events:auto;margin:11px 0 4px;display:flex;flex-wrap:wrap;align-items:center}
+  #filter{pointer-events:auto;margin:9px 0 1px;display:flex;flex-wrap:wrap;align-items:flex-end}
   #filter label{
-    display:inline-flex;align-items:center;gap:6px;cursor:pointer;
-    font-size:13.5px;color:var(--ink-45);margin:0 15px 7px 0;user-select:none;
-    white-space:nowrap;
+    display:flex;flex-direction:column;align-items:center;cursor:pointer;
+    width:70px;margin:0 1px 7px;user-select:none;color:var(--ink-45);
   }
-  #filter label::before{
-    content:"";width:10px;height:10px;flex:0 0 auto;
-    border:1px solid var(--ink-45);
+  #filter .fg{
+    display:flex;align-items:center;justify-content:center;gap:4px;
+    height:23px;font-size:19px;line-height:1;color:var(--ink-28);
+  }
+  #filter .fn{
+    font-size:9.5px;line-height:1.18;margin-top:3px;text-align:center;
+  }
+  #filter .fb{
+    margin-top:4px;width:10px;height:10px;border:1px solid var(--ink-45);flex:0 0 auto;
   }
   #filter label.on{color:var(--ink)}
-  #filter label.on::before{background:var(--ink);border-color:var(--ink)}
+  #filter label.on .fg{color:var(--ink)}
+  #filter label.on .fb{background:var(--ink);border-color:var(--ink)}
   #filter label:hover{color:var(--ink-70)}
+  #filter label:hover .fg{color:var(--ink-45)}
   #filter input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
   #filter .sep{
-    font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-28);
-    margin:0 12px 7px 4px;white-space:nowrap;
+    font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-28);
+    align-self:center;margin:0 8px 7px 10px;
+  }
+  @media (max-width:700px){
+    #filter label{width:56px;margin-bottom:6px}
+    #filter .fg{font-size:16px;height:19px}
+    #filter .fn{font-size:8.5px}
   }
   @media (max-width:700px){
     #head{left:14px;top:10px;width:calc(100vw - 28px)}
@@ -188,11 +201,11 @@ function T(pair){ return !pair ? '' : (LANG === 'ru' ? pair[0] : pair[1]); }
 
 var UI = {
   title:['Карта букв','Letter Map'],
-  sub:['Три цепочки: ʾалеф, бет, гимель. Включайте алфавиты галочками — их буквы встанут в те же цепочки, и будет видно, где корни сходятся.',
-       'Three chains: ʾaleph, beth, gimel. Tick alphabets to add them — their letters join the same chains, so you can see where the roots meet.'],
+  sub:['Три цепочки: ʾалеф, бет, гимель. Включайте алфавиты галочками — их буквы встанут в те же цепочки.',
+       'Three chains: ʾaleph, beth, gimel. Tick alphabets — their letters join the same chains.'],
   extinct:['вымершие:','extinct:'],
-  hint:['Тяните карту, щипок — масштаб. Наведите на узел. Клавиша 0 — вернуть обзор.',
-        'Drag to pan, pinch to zoom. Hover a node. Press 0 to fit.'],
+  hint:['Тяните карту, щипок — масштаб. Клавиша 0 — обзор.',
+        'Drag to pan, pinch to zoom. Press 0 to fit.'],
   links:['<a href="latin.html">Латиница по этапам</a> · <a href="scripts.html">Дерево письменностей</a>',
          '<a href="latin.html">Latin, stage by stage</a> · <a href="scripts.html">Tree of scripts</a>'],
   close:['закрыть','close'],
@@ -718,6 +731,21 @@ var SCL = {
    'Same as Armenian: the link rests on the order and the names — an, ban, gan — not on the shapes. "Their exact origin has never been established."']})
 };
 
+/* где письменность двухрегистровая — вторая, строчная форма буквы */
+(function(){
+  var LOWER = {
+    grk: [['α','f-lat'],['β','f-lat'],['γ','f-lat']],
+    cyr: [['а','f-lat'],['в','f-lat'],['г','f-lat']],
+    copt:[['ⲁ','f-cop'],['ⲃ','f-cop'],['ⲅ','f-cop']],
+    arm: [['ա','f-arm'],['բ','f-arm'],['գ','f-arm']],
+    glag:[['ⰰ','f-gla'],['ⰱ','f-gla'],['ⰳ','f-gla']]
+  };
+  Object.keys(LOWER).forEach(function(id){ if(SCL[id]) SCL[id].g2 = LOWER[id]; });
+  /* узел слияния регистров — настоящая пара */
+  SCL.latBi.g  = [['A','f-lat'],['B','f-lat'],['C','f-lat']];
+  SCL.latBi.g2 = [['a','f-lat'],['b','f-lat'],['c','f-lat']];
+})();
+
 /* живые алфавиты — в фильтр; вымершие — отдельной строкой */
 var ALSO = {lat:['latMaj','latBlack','latBi','latNrc']};
 var LIVING  = ['lat','grk','cyr','heb','arab','syr','geez','arm','geo','copt','mong','sam','mand'];
@@ -744,7 +772,7 @@ function visibleSet(){
 }
 
 /* ═══ раскладка ═══ */
-var COLP = 236, ROWH = 62, NODEW = 192, GW = 32, BANDGAP = 118;
+var COLP = 226, ROWH = 112, NODEW = 150, GW = 34, ATTACH = 32, BANDGAP = 150;
 var world = document.getElementById('world');
 var stage = document.getElementById('stage');
 var pop = document.getElementById('pop');
@@ -765,6 +793,9 @@ function buildLayout(){
     while(SCL[cur].p && vis[SCL[cur].p]){ cur = SCL[cur].p; c++; }
     depth[id] = c;
   });
+  /* «капитал без изменений» уезжает в колонку современной строчной,
+     чтобы его линия шла одной прямой поверху и ничего не пересекала */
+  if(vis.latMaj && vis.lat) depth.latMaj = depth.lat;
   var lane = 0, row = {};
   function walk(id){
     if(!kids[id].length){ row[id] = lane++; return; }
@@ -791,6 +822,20 @@ function buildLayout(){
   worldH = 70 + 3 * bandH + 2 * BANDGAP + 60;
 }
 
+/* прямая, поворот под прямым углом со скруглением, снова прямая */
+function elbow(sx, sy, ex, ey){
+  if(Math.abs(sy - ey) < 0.6) return 'M' + sx + ' ' + sy + 'L' + ex + ' ' + ey;
+  var mx = (sx + ex) / 2;
+  var dir = ey > sy ? 1 : -1;
+  var r = Math.min(16, Math.abs(ey - sy) / 2, Math.abs(ex - sx) / 2);
+  return 'M' + sx + ' ' + sy +
+         'L' + (mx - r) + ' ' + sy +
+         'Q' + mx + ' ' + sy + ' ' + mx + ' ' + (sy + dir * r) +
+         'L' + mx + ' ' + (ey - dir * r) +
+         'Q' + mx + ' ' + ey + ' ' + (mx + r) + ' ' + ey +
+         'L' + ex + ' ' + ey;
+}
+
 function render(){
   buildLayout();
   world.innerHTML = '';
@@ -804,23 +849,16 @@ function render(){
     if(n.label || !n.parent) return;
     var a = POS[n.line + ':' + n.parent];
     if(!a) return;
-    var sx = a.x + NODEW - 6, sy = a.y, ex = n.x - 10, ey = n.y;
-    var mx = (sx + ex) / 2;
-    var seg = (Math.abs(sy - ey) < 1)
-      ? 'M' + sx + ' ' + sy + 'L' + ex + ' ' + ey
-      : 'M' + sx + ' ' + sy + 'C' + mx + ' ' + sy + ',' + mx + ' ' + ey + ',' + ex + ' ' + ey;
+    var seg = elbow(a.x + NODEW / 2 + ATTACH, a.y, n.x + NODEW / 2 - ATTACH, n.y);
     if(n.sc === 'egy') dh += seg; else d += seg;
   });
   /* рёбра, которых не бывает в дереве с одним родителем */
-  var MERGE = [['latMaj','latBi'], ['latNrc','latUnc'], ['latNrc','latHunc']];
+  var MERGE = [['latMaj','latBi'], ['latNrc','latHunc']];
   for(var li = 0; li < 3; li++){
     MERGE.forEach(function(pair){
       var a2 = POS[li + ':' + pair[0]], b2 = POS[li + ':' + pair[1]];
-      if(!a2 || !b2) return;
-      var sx2 = a2.x + NODEW - 6, sy2 = a2.y, ex2 = b2.x - 10, ey2 = b2.y;
-      if(ex2 < sx2 + 8){ sx2 = a2.x + NODEW / 2; ex2 = b2.x + NODEW / 2; }
-      var mx2 = (sx2 + ex2) / 2;
-      d += 'M' + sx2 + ' ' + sy2 + 'C' + mx2 + ' ' + sy2 + ',' + mx2 + ' ' + ey2 + ',' + ex2 + ' ' + ey2;
+      if(!a2 || !b2 || b2.x <= a2.x) return;
+      d += elbow(a2.x + NODEW / 2 + ATTACH, a2.y, b2.x + NODEW / 2 - ATTACH, b2.y);
     });
   }
   svg.innerHTML = '<path d="' + d + '"/><path class="hedge" d="' + dh + '"/>';
@@ -842,12 +880,13 @@ function render(){
     b.setAttribute('aria-expanded', 'false');
     b.setAttribute('aria-label', T(sc.n) + ', ' + half(L.ln[n.line]));
     b.dataset.id = key;
-    b.style.left = n.x + 'px'; b.style.top = (n.y - ROWH / 2) + 'px';
-    b.style.width = NODEW + 'px'; b.style.height = ROWH + 'px';
-    b.innerHTML = glyphHTML(g, GW) +
-      '<span class="tx"><span class="nm">' + half(L.ln[n.line]) + '</span>' +
-      '<span class="dt">' + T(sc.n) + '</span>' +
-      '<span class="dt">' + T(sc.d) + '</span></span>';
+    b.style.left = n.x + 'px'; b.style.top = (n.y - 20) + 'px';
+    b.style.width = NODEW + 'px';
+    var g2 = L.g2 ? L.g2[n.line] : null;
+    b.innerHTML = '<span class="pair">' + glyphHTML(g, GW) +
+      (g2 ? glyphHTML(g2, Math.round(GW * 0.78)) : '') + '</span>' +
+      '<span class="tx"><span class="nm">' + T(sc.n) + '</span>' +
+      '<span class="dt">' + half(L.ln[n.line]) + ' · ' + T(sc.d) + '</span></span>';
     world.appendChild(b);
   });
   if(openId && !POS[openId]) hidePop();
@@ -872,17 +911,25 @@ function glyphHTML(g, px){
 
 /* ═══ шапка и фильтр ═══ */
 function chip(id){
-  var on = !!SELECTED[id];
+  var on = !!SELECTED[id], L = SCL[id];
+  var up = L && L.g ? L.g[0] : null, lo = L && L.g2 ? L.g2[0] : null;
+  function one(g, cls){
+    if(!g) return '';
+    if(typeof g === 'string') return '';
+    return '<span class="' + g[1] + '">' + g[0] + '</span>';
+  }
   return '<label class="' + (on ? 'on' : '') + '" data-sc="' + id + '">' +
-         '<input type="checkbox"' + (on ? ' checked' : '') + '>' + T(SC[id].n) + '</label>';
+         '<span class="fg">' + one(up) + one(lo) + '</span>' +
+         '<span class="fn">' + T(SC[id].n) + '</span>' +
+         '<span class="fb"></span>' +
+         '<input type="checkbox"' + (on ? ' checked' : '') + '></label>';
 }
 document.getElementById('head').innerHTML =
   '<h1>' + T(UI.title) + '</h1>' +
   '<p>' + T(UI.sub) + '</p>' +
   '<div id="filter">' + LIVING.map(chip).join('') +
   '<span class="sep">' + T(UI.extinct) + '</span>' + EXTINCT.map(chip).join('') + '</div>' +
-  '<p class="small">' + T(UI.hint) + '</p>' +
-  '<p class="small">' + T(UI.links) + '</p>';
+  '<p class="small">' + T(UI.hint) + '  ·  ' + T(UI.links) + '</p>';
 
 document.getElementById('filter').addEventListener('click', function(e){
   var lab = e.target.closest('label'); if(!lab) return;
@@ -949,7 +996,24 @@ function hidePop(){
 
 /* ═══ свободный холст ═══ */
 var tx = 0, ty = 0, k = 1;
+function clampView(){
+  var vw = stage.clientWidth, vh = stage.clientHeight;
+  var W = (worldW + 60) * k, H = (worldH + 40) * k;
+  var top = headroom();
+  /* карта всегда остаётся на экране: по краям можно выйти не больше чем на треть */
+  /* сколько карты обязано остаться в видимой области */
+  var keepX = Math.min(W, Math.max(300, vw * 0.42));
+  var keepY = Math.min(H, Math.max(200, (vh - top) * 0.45));
+  tx = Math.max(keepX - W, Math.min(vw - keepX, tx));
+  ty = Math.max(top + keepY - H, Math.min(vh - keepY, ty));
+}
+function minZoom(){
+  var vw = stage.clientWidth, vh = stage.clientHeight;
+  var f = Math.min((vw - 64) / (worldW + 60), (vh - headroom() - 64) / (worldH + 40));
+  return Math.max(0.05, Math.min(0.5, f * 0.85));
+}
 function apply(){
+  clampView();
   world.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + k + ')';
   if(openId) placePop(openId);
 }
@@ -958,11 +1022,11 @@ function fit(){
   var vw = stage.clientWidth, vh = stage.clientHeight;
   var padL = 30, padT = headroom(), padR = 34, padB = 30;
   k = Math.min((vw - padL - padR) / (worldW + 60), (vh - padT - padB) / (worldH + 40));
-  k = Math.max(0.06, Math.min(1, k));
+  k = Math.max(0.05, Math.min(1, k));
   tx = padL; ty = padT; apply();
 }
 function zoomAt(cx, cy, nk){
-  nk = Math.max(0.06, Math.min(4, nk));
+  nk = Math.max(minZoom(), Math.min(3.2, nk));
   tx = cx - (cx - tx) * (nk / k);
   ty = cy - (cy - ty) * (nk / k);
   k = nk; apply();
