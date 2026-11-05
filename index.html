@@ -227,6 +227,9 @@ var DRAWN = {
   nrc_a: ["M66 40 C56 30 34 32 28 48 C22 66 36 80 52 76 C60 74 66 66 66 58","M66 30 L66 80"],
   unc_A: ["M72 18 C44 24 26 44 26 62 C26 78 44 84 60 76 C68 72 72 66 72 58","M72 18 L72 80"],
   hunc_a: ["M66 42 C58 33 39 33 32 46 C25 61 34 78 50 78 C60 78 66 71 66 61","M66 40 L66 80"],
+  lat_G: ["M74 24 C56 12 26 20 26 50 C26 78 54 88 72 78","M72 54 L72 78"],
+  unc_g: ["M34 30 L66 30","M42 30 C36 44 40 54 56 54 C70 54 74 72 60 82 C50 89 40 86 36 80"],
+  car_g: ["M62 40 C56 32 40 32 34 42 C28 54 38 64 50 62 C58 61 62 56 62 48","M62 38 C62 50 60 58 62 66 C64 78 52 86 38 82","M62 38 C66 32 72 32 76 36"],
   car_a: ["M68 47 C60 37 40 37 33 50 C26 65 35 79 51 79 C62 79 68 71 68 62","M68 44 L68 81"],
   gk_b_arch: ["M28 14 L28 86","M28 14 L62 24 L28 48","M28 48 L66 60 L28 86"],
   gk_b_west: ["M30 14 L30 86","M30 14 C62 14 66 44 30 48","M30 48 C68 48 72 86 30 86"],
@@ -296,6 +299,36 @@ var SC = {
       ['Гуманисты XV века вернули римский капитал как прописную к своему минускулу, и с него печатники нарезали первые шрифты антиквы. Это не новая буква, а та же самая.',
        'The 15th-century humanists brought the Roman capital back as the uppercase for their minuscule, and the printers cut the first roman types from it. Not a new letter — the same one.']],
    u:'', s:[W('Roman_square_capitals'), W('Humanist_minuscule')]},
+
+ latG:{n:['Рождение G','The birth of G'], d:['ок. 230 г. до н. э.','c. 230 BCE'],
+   m:['Рим','Rome'],
+   x:[['Единственный случай в этих трёх цепочках, когда буква делится надвое. «K» вышла из употребления, «C» стала передавать /k/ во всех позициях — и звонкий /g/ остался без знака. Тогда к C просто добавили штрих.',
+       'The one case in these three chains where a letter splits in two. "K" had fallen out of favor, "C" had come to express /k/ in all environments — and the voiced /g/ was left with no sign. So a stroke was added to C.'],
+      ['Создателем называют Спурия Карвилия Ругу, вольноотпущенника, открывшего около 230 г. до н. э. первую в Риме платную школу. Источник — Плутарх; атрибуция оспаривалась.',
+       'The recorded originator is Spurius Carvilius Ruga, a freedman who opened the first fee-paying school in Rome around 230 BCE. The source is Plutarch; the attribution has been disputed.'],
+      ['И вот где цепочки действительно пересекаются: новую букву поставили на СЕДЬМОЕ место — туда, где раньше стояла Z, выброшенная из алфавита цензором Аппием Клавдием. То есть G заняла чужую могилу. Z вернётся в латиницу много позже, снова из греческого, и встанет уже в конец.',
+       'And here is where the chains really do cross: the new letter took SEVENTH place — the slot of Z, which the censor Appius Claudius had thrown out of the alphabet. G moved into another letter\u2019s grave. Z would return to Latin much later, from Greek again, and take a place at the end.']],
+   u:'', s:[W('G'), W('Spurius_Carvilius_Ruga')]},
+
+ latGunc:{n:['Унциальная ᵹ','Uncial ᵹ'], d:['IV–VIII вв.','4th–8th c. CE'],
+   m:['Латинский Запад','the Latin West'],
+   x:[['«⟨g⟩ имеет плоский верх, без чашки, и изогнутый выносной элемент ⟨ᵹ⟩ — отчасти похожа на цифру 5». На эту форму g была непохожа ни до, ни после.',
+       '"g has a flat top, no bow, and a curved descender — somewhat resembling the digit 5." The letter looked like this neither before nor after.']],
+   u:'', s:[W('Half-uncial'), W('Uncial_script')]},
+
+ latGcar:{n:['Каролингская g','Carolingian g'], d:['IX в.','9th c.'],
+   m:['Ахен, Тур','Aachen, Tours'],
+   x:[['«Буква g по существу та же, что современная строчная, а не прежняя унциальная ᵹ». Дальше она уже не меняется — меняется только выбор между двумя её изводами.',
+       '"The letter g is essentially the same as the modern minuscule letter, rather than the previously common uncial ᵹ." After this it no longer changes — only the choice between its two variants does.']],
+   u:'', s:[W('Carolingian_minuscule'), W('G')]},
+
+ latGmod:{n:['Современные G и g','Modern G and g'], d:['сегодня','today'],
+   m:['Латиница','Latin alphabet'],
+   x:[['Двухэтажная «петлехвостая» g — исходная, каролингская; она в большинстве антиквенных шрифтов, и у неё есть «ушко» справа вверху. Одноэтажная «открытохвостая» появилась позже, в монастырском переписывании; ею печатал Гутенберг, а гуманисты вернулись к петле.',
+       'The double-storey "looptail" g is the original, the Carolingian one; it is in most serif types and has an "ear" at the upper right. The single-storey "opentail" came later, from monastic copying; Gutenberg printed with it, and the humanists went back to the loop.'],
+      ['Для Юникода это одна буква: U+0067 покрывает оба начертания. Отдельный знак ɡ (U+0261) существует только для строгой записи МФА.',
+       'For Unicode it is one letter: U+0067 covers both shapes. The separate ɡ (U+0261) exists only for strict IPA notation.']],
+   u:'U+0047 · U+0067', s:[W('G')]},
 
  latBi:{n:['Два регистра в одном тексте','Two cases in one text'], d:['с IX в., закреплено печатью','from the 9th c., fixed by printing'],
    m:['Европа','Europe'],
@@ -466,8 +499,12 @@ var SC = {
  arab:{n:['Арабское письмо','Arabic script'], d:['III–IV вв.','3rd–4th c. CE'],
    m:['Аравия','Arabia'],
    x:[['Второе в мире по распространённости. «Большинство лингвистов полагают, что оно развилось из набатейского письма в IV веке».',
-       'The second most widely used script in the world. "Most linguists believe [it] developed from the Nabataean script in the fourth century AD."']],
-   u:'U+0600–U+06FF', s:[W('Arabic_alphabet'), UC('0600')]},
+       'The second most widely used script in the world. "Most linguists believe [it] developed from the Nabataean script in the fourth century AD."'],
+      ['Здесь буквы пересекаются сильнее, чем где-либо в латинице. Голый костяк письма — расм — «насчитывает 18 элементов», и «в начальной и срединной позиции различимых начертаний всего 15» на весь алфавит. Различают буквы точки: без них «две разные буквы ص ض неразличимы».',
+       'Here letters overlap more than anywhere in Latin. The bare skeleton of the script — the rasm — "has 18 elements", and "this results in only 15 visually distinct glyphs each in the initial and medial positions" for the whole alphabet. What separates the letters are dots: without them "the two distinct letters ص ض are indistinguishable".'],
+      ['Когда точки появились и кто их ввёл, страница не говорит: сказано лишь, что в ранних рукописях VII–VIII веков они есть, но «ставить точки ни в коем случае не было обязательным».',
+       'The page does not say when the dots appeared or who introduced them: only that early 7th- and 8th-century manuscripts have some, but "putting dots was in no case compulsory".']],
+   u:'U+0600–U+06FF', s:[W('Arabic_alphabet'), W('Rasm'), UC('0600')]},
 
  palm:{n:['Пальмирское письмо','Palmyrene alphabet'], d:['с I в. до н. э.','from the 1st c. BCE'],
    m:['Пальмира, Сирия','Palmyra, Syria'],
@@ -676,6 +713,11 @@ var SCL = {
       'Around 230 BCE a stroke was added to C to make G, and the new letter took seventh place — the slot of the Z discarded by the censor Appius Claudius.']}),
 
  latMaj: S('latCap','A','B','C','f-lat', ['A','B','C'], {}),
+ latG:   {p:'latOld',  only:[2], g:['lat_G','lat_G','lat_G'], ln:['G','G','G'], nt:{}},
+ latGunc:{p:'latG',    only:[2], g:['unc_g','unc_g','unc_g'], ln:['ᵹ','ᵹ','ᵹ'], nt:{}},
+ latGcar:{p:'latGunc', only:[2], g:['car_g','car_g','car_g'], ln:['g','g','g'], nt:{}},
+ latGmod:{p:'latGcar', only:[2], g:[['G','f-lat'],['G','f-lat'],['G','f-lat']],
+          g2:[['g','f-lat'],['g','f-lat'],['g','f-lat']], ln:['G g','G g','G g'], nt:{}},
  latBi:  {p:'lat', g:[['A a','f-lat',.5],['B b','f-lat',.5],['C c','f-lat',.5]],
           ln:['A a','B b','C c'], nt:{}},
  latRust:S('latCap','rust_A','rust_B','rust_C', null, ['A','B','C'], {}),
@@ -747,7 +789,7 @@ var SCL = {
 })();
 
 /* живые алфавиты — в фильтр; вымершие — отдельной строкой */
-var ALSO = {lat:['latMaj','latBlack','latBi','latNrc']};
+var ALSO = {lat:['latMaj','latBlack','latBi','latNrc','latGmod']};
 var LIVING  = ['lat','grk','cyr','heb','arab','syr','geez','arm','geo','copt','mong','sam','mand'];
 var EXTINCT = ['ugar','goth','glag','cun'];
 var SELECTED = {lat:true};
@@ -796,6 +838,7 @@ function buildLayout(){
   /* «капитал без изменений» уезжает в колонку современной строчной,
      чтобы его линия шла одной прямой поверху и ничего не пересекала */
   if(vis.latMaj && vis.lat) depth.latMaj = depth.lat;
+  if(vis.latGmod && vis.lat) depth.latGmod = depth.lat;
   var lane = 0, row = {};
   function walk(id){
     if(!kids[id].length){ row[id] = lane++; return; }
@@ -805,21 +848,27 @@ function buildLayout(){
   roots.sort(function(a, b){ return (a === 'cun' ? -1 : 0) - (b === 'cun' ? -1 : 0); });
   roots.forEach(function(r, i){ if(i) lane += 0.6; walk(r); });
 
-  var bandH = lane * ROWH;
   POS = {}; worldW = 0;
-  var cols = 0;
-  ids.forEach(function(id){ cols = Math.max(cols, depth[id]); });
+  var cursor = 70;
   for(var li = 0; li < 3; li++){
-    var off = 70 + li * (bandH + BANDGAP);
-    ids.forEach(function(id){
+    /* каждая полоса занимает ровно столько, сколько в ней узлов:
+       ветка G есть только у гимеля, у остальных её дорожки пустуют */
+    var mine = ids.filter(function(id){
+      return !SCL[id].only || SCL[id].only.indexOf(li) >= 0;
+    });
+    var lo = Infinity, hi = -Infinity;
+    mine.forEach(function(id){ lo = Math.min(lo, row[id]); hi = Math.max(hi, row[id]); });
+    var off = cursor - lo * ROWH;
+    mine.forEach(function(id){
       var x = depth[id] * COLP;
       var y = off + row[id] * ROWH + ROWH / 2;
       POS[li + ':' + id] = {x:x, y:y, line:li, sc:id, parent:(SCL[id].p && vis[SCL[id].p]) ? SCL[id].p : null};
       worldW = Math.max(worldW, x + NODEW);
     });
-    POS['band' + li] = {x:-10, y:off - 34, label:true, line:li};
+    POS['band' + li] = {x:-10, y:cursor - 34, label:true, line:li};
+    cursor += (hi - lo + 1) * ROWH + BANDGAP;
   }
-  worldH = 70 + 3 * bandH + 2 * BANDGAP + 60;
+  worldH = cursor - BANDGAP + 60;
 }
 
 /* прямая, поворот под прямым углом со скруглением, снова прямая */
